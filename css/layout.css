@@ -1,0 +1,484 @@
+/* ============================================================
+   MIRSAD — Layout System
+   Grid layout, navigation, responsive design
+   ============================================================ */
+
+/* ── Main App Shell ── */
+.app-shell {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: var(--color-bg-primary);
+}
+
+/* ── Top Bar ── */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  padding: 0 var(--space-3);
+  background: var(--color-surface-1);
+  border-bottom: 1px solid var(--color-border-subtle);
+  z-index: var(--z-sticky);
+  position: relative;
+}
+
+.top-bar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--color-border-subtle);
+}
+
+.top-bar__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.top-bar__logo {
+  width: 32px;
+  height: 32px;
+  background: var(--color-accent-primary);
+  color: var(--color-text-inverse);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.top-bar__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wider);
+  text-transform: uppercase;
+  color: var(--color-accent-primary);
+}
+
+.top-bar__subtitle {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  margin-left: var(--space-2);
+  padding-left: var(--space-2);
+  border-left: 1px solid var(--color-border-default);
+}
+
+/* ── Navigation Tabs ── */
+.top-bar__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 100%;
+}
+
+.nav-tab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+  white-space: nowrap;
+}
+
+.nav-tab:hover {
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.nav-tab.active {
+  color: var(--color-accent-primary);
+}
+
+.nav-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: var(--space-2);
+  right: var(--space-2);
+  height: 2px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-full) var(--radius-full) 0 0;
+}
+
+.nav-tab__icon {
+  font-size: var(--font-size-md);
+  opacity: 0.8;
+}
+
+.nav-tab.active .nav-tab__icon {
+  opacity: 1;
+}
+
+/* ── Status Indicators in Top Bar ── */
+.top-bar__status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.status-indicator__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-success);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.status-indicator__dot--warning {
+  background: var(--color-warning);
+}
+
+.status-indicator__dot--danger {
+  background: var(--color-error);
+  animation: critical-pulse 1.5s ease-in-out infinite;
+}
+
+/* ── KPI Ticker Bar ── */
+.kpi-ticker {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 var(--space-5);
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border-subtle);
+  gap: var(--space-6);
+  overflow-x: auto;
+}
+
+.kpi-ticker::-webkit-scrollbar {
+  display: none;
+}
+
+.kpi-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.kpi-item__label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wider);
+}
+
+.kpi-item__value {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.kpi-item__change {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.kpi-item__change--up {
+  color: var(--color-error);
+  background: var(--color-error-bg);
+}
+
+.kpi-item__change--down {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.kpi-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--color-border-default);
+  flex-shrink: 0;
+}
+
+/* ── Main Content Area ── */
+.main-content {
+  display: grid;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── View Panels ── */
+.view-panel {
+  display: none;
+  grid-row: 1;
+  grid-column: 1;
+  overflow: hidden;
+}
+
+.view-panel.active {
+  display: grid;
+  animation: fade-in 0.3s ease;
+}
+
+/* ── Command Center Layout ── */
+.command-center {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  grid-template-rows: 1fr;
+  gap: 0;
+  height: 100%;
+}
+
+.command-center__map {
+  position: relative;
+  overflow: hidden;
+}
+
+.command-center__sidebar {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-1);
+  border-left: 1px solid var(--color-border-subtle);
+  overflow: hidden;
+}
+
+/* ── Risk Intelligence Layout ── */
+.risk-intel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  overflow-y: auto;
+}
+
+.risk-intel__header {
+  grid-column: 1 / -1;
+}
+
+/* ── Scenario Modeller Layout ── */
+.scenario-view {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  grid-template-rows: 1fr;
+  gap: 0;
+  height: 100%;
+}
+
+.scenario-view__controls {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-1);
+  border-right: 1px solid var(--color-border-subtle);
+  overflow-y: auto;
+  padding: var(--space-4);
+}
+
+.scenario-view__results {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  overflow-y: auto;
+}
+
+/* ── Procurement Layout ── */
+.procurement-view {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  overflow-y: auto;
+}
+
+/* ── Reserves Layout ── */
+.reserves-view {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  overflow-y: auto;
+}
+
+.reserves-view__header {
+  grid-column: 1 / -1;
+}
+
+/* ── Section Headers ── */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.section-header__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.section-header__title h2 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.section-header__title .icon {
+  font-size: var(--font-size-2xl);
+}
+
+.section-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ── Sidebar Sections ── */
+.sidebar-section {
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.sidebar-section__title {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-widest);
+  margin-bottom: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ── Scrollable Panels ── */
+.scroll-panel {
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* ── Responsive ── */
+@media (max-width: var(--bp-desktop)) {
+  .command-center {
+    grid-template-columns: 1fr 320px;
+  }
+  
+  .scenario-view {
+    grid-template-columns: 300px 1fr;
+  }
+}
+
+@media (max-width: var(--bp-tablet)) {
+  .command-center {
+    grid-template-columns: 1fr 280px;
+  }
+  
+  .risk-intel {
+    grid-template-columns: 1fr;
+  }
+  
+  .scenario-view__results {
+    grid-template-columns: 1fr;
+  }
+  
+  .reserves-view {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) { /* Mobile specific layout */
+  /* Top Nav becomes Bottom Nav */
+  .top-bar__nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--color-surface-1);
+    border-top: 1px solid var(--color-border-subtle);
+    justify-content: space-around;
+    z-index: var(--z-sticky);
+    height: 64px;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .nav-tab {
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    font-size: 10px;
+    padding: var(--space-2);
+    min-width: 44px; /* Touch target */
+    min-height: 44px; /* Touch target */
+  }
+  
+  .nav-tab.active::after {
+    top: 0;
+    bottom: auto;
+    border-radius: 0 0 var(--radius-full) var(--radius-full);
+  }
+
+  /* Make room for bottom nav */
+  .main-content {
+    padding-bottom: 64px;
+  }
+
+  /* Adjust Top Bar */
+  .top-bar {
+    padding: 0 var(--space-2);
+  }
+  .top-bar__subtitle {
+    display: none;
+  }
+  .status-indicator > span {
+    display: none; /* Hide "System Active" text, keep dot */
+  }
+
+  /* Stack view layouts vertically */
+  .command-center {
+    grid-template-columns: 1fr;
+    grid-template-rows: 50vh auto;
+    overflow-y: auto;
+  }
+  .command-center__sidebar {
+    border-left: none;
+    border-top: 1px solid var(--color-border-subtle);
+  }
+  .scenario-view {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    overflow-y: auto;
+  }
+  .scenario-view__controls {
+    border-right: none;
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+}

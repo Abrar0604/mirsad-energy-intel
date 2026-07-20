@@ -1,0 +1,346 @@
+/* ============================================================
+   MIRSAD (مرصاد) — Design System
+   AI-Powered Energy Supply Chain Resilience Platform
+   ============================================================ */
+
+/* ── Google Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+/* ── CSS Custom Properties ── */
+:root {
+  /* ── Surface Colors ── */
+  --color-bg-primary: #f7f9f7;     /* Soft off-white/very light sage */
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #f0f4f0;
+  --color-surface-1: #ffffff;
+  --color-surface-2: #fafbfa;
+  --color-surface-3: #f2f5f2;
+  --color-surface-hover: #eef2ee;
+  
+  /* Remove glassmorphism, replace with solid fallbacks if used */
+  --color-surface-glass: rgba(255, 255, 255, 0.95);
+  --color-surface-glass-hover: rgba(255, 255, 255, 1);
+
+  /* ── Border Colors ── */
+  --color-border-subtle: rgba(0, 0, 0, 0.05);
+  --color-border-default: rgba(0, 0, 0, 0.08);
+  --color-border-strong: rgba(0, 0, 0, 0.15);
+  --color-border-accent: rgba(132, 155, 135, 0.3);
+
+  /* ── Text Colors ── */
+  --color-text-primary: #2d3732;   /* Dark sage/charcoal */
+  --color-text-secondary: #5e6c64;
+  --color-text-tertiary: #88998f;
+  --color-text-muted: #a3b3a9;
+  --color-text-inverse: #ffffff;
+
+  /* ── Accent Colors ── */
+  --color-accent-primary: #849b87; /* Muted sage green */
+  --color-accent-primary-dim: rgba(132, 155, 135, 0.15);
+  --color-accent-secondary: #a3b8a6;
+  --color-accent-tertiary: #c1d6c4;
+  --color-accent-glow: rgba(132, 155, 135, 0.2);
+
+  /* ── Risk Severity Scale ── */
+  /* Softened versions for a human-designed look */
+  --color-risk-low: #7fa183;
+  --color-risk-low-bg: rgba(127, 161, 131, 0.12);
+  --color-risk-moderate: #d6ba73;
+  --color-risk-moderate-bg: rgba(214, 186, 115, 0.12);
+  --color-risk-elevated: #d19a6b;
+  --color-risk-elevated-bg: rgba(209, 154, 107, 0.12);
+  --color-risk-high: #c77b76;
+  --color-risk-high-bg: rgba(199, 123, 118, 0.12);
+  --color-risk-critical: #b8625e;
+  --color-risk-critical-bg: rgba(184, 98, 94, 0.15);
+  --color-risk-critical-glow: rgba(184, 98, 94, 0.3);
+
+  /* ── Status Colors ── */
+  --color-success: #7fa183;
+  --color-success-bg: rgba(127, 161, 131, 0.12);
+  --color-warning: #d6ba73;
+  --color-warning-bg: rgba(214, 186, 115, 0.12);
+  --color-error: #c77b76;
+  --color-error-bg: rgba(199, 123, 118, 0.12);
+  --color-info: #799bb3;
+  --color-info-bg: rgba(121, 155, 179, 0.12);
+
+  /* ── Gradients ── */
+  /* Gradients removed - replacing with solid colors as per constraints */
+  --gradient-primary: var(--color-accent-primary);
+  --gradient-risk: var(--color-risk-elevated);
+  --gradient-surface: var(--color-bg-secondary);
+  --gradient-glass: var(--color-surface-glass);
+  --gradient-hero: var(--color-bg-primary);
+  --gradient-accent-border: var(--color-accent-primary);
+  --gradient-danger-border: var(--color-risk-critical);
+
+  /* ── Typography ── */
+  /* Replacing Inter with a softer serif or sans-serif combination if possible, 
+     but keeping existing stack and just making it lighter visually */
+  --font-family-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  --font-size-xs: 0.6875rem;    /* 11px */
+  --font-size-sm: 0.75rem;      /* 12px */
+  --font-size-base: 0.8125rem;  /* 13px */
+  --font-size-md: 0.875rem;     /* 14px */
+  --font-size-lg: 1rem;         /* 16px */
+  --font-size-xl: 1.125rem;     /* 18px */
+  --font-size-2xl: 1.375rem;    /* 22px */
+  --font-size-3xl: 1.75rem;     /* 28px */
+  --font-size-4xl: 2.25rem;     /* 36px */
+  --font-size-5xl: 3rem;        /* 48px */
+
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  --line-height-tight: 1.2;
+  --line-height-snug: 1.35;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.65;
+
+  --letter-spacing-tight: -0.01em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.02em;
+  --letter-spacing-wider: 0.04em;
+  --letter-spacing-widest: 0.08em;
+
+  /* ── Spacing ── */
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+
+  /* ── Border Radius ── */
+  /* Slightly more rounded for a softer look */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ── */
+  /* Soft, diffused shadows */
+  --shadow-sm: 0 1px 3px rgba(45, 55, 50, 0.05);
+  --shadow-md: 0 4px 12px rgba(45, 55, 50, 0.08);
+  --shadow-lg: 0 12px 32px rgba(45, 55, 50, 0.12);
+  --shadow-xl: 0 20px 48px rgba(45, 55, 50, 0.15);
+  --shadow-glow-accent: 0 0 16px var(--color-accent-glow);
+  --shadow-glow-danger: 0 0 16px var(--color-risk-critical-glow);
+  --shadow-inset: inset 0 1px 0 rgba(0, 0, 0, 0.02);
+
+  /* ── Transitions ── */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Z-Index Scale ── */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-popover: 500;
+  --z-toast: 600;
+  --z-tooltip: 700;
+
+  /* ── Icons ── */
+  --icon-size-sm: 14px;
+  --icon-size-md: 16px;
+  --icon-size-lg: 20px;
+  --icon-size-xl: 24px;
+
+  /* ── Breakpoints ── */
+  --bp-mobile: 768px;
+  --bp-tablet: 1024px;
+  --bp-desktop: 1440px;
+
+  /* ── Focus ── */
+  --focus-ring: 0 0 0 3px rgba(132, 155, 135, 0.4);
+
+  /* ── Glassmorphism (Disabled) ── */
+  --glass-blur: 0px;
+  --glass-blur-heavy: 0px;
+  --glass-bg: var(--color-bg-secondary);
+  --glass-border: 1px solid var(--color-border-default);
+}
+
+/* ── Reset & Base ── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-family-ui);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* ── Typography Utilities ── */
+.text-xs { font-size: var(--font-size-xs); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-base { font-size: var(--font-size-base); }
+.text-md { font-size: var(--font-size-md); }
+.text-lg { font-size: var(--font-size-lg); }
+.text-xl { font-size: var(--font-size-xl); }
+.text-2xl { font-size: var(--font-size-2xl); }
+.text-3xl { font-size: var(--font-size-3xl); }
+.text-4xl { font-size: var(--font-size-4xl); }
+
+.font-light { font-weight: var(--font-weight-light); }
+.font-regular { font-weight: var(--font-weight-regular); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+.font-extrabold { font-weight: var(--font-weight-extrabold); }
+
+.font-mono { font-family: var(--font-family-mono); }
+
+.text-primary { color: var(--color-text-primary); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-tertiary { color: var(--color-text-tertiary); }
+.text-muted { color: var(--color-text-muted); }
+.text-accent { color: var(--color-accent-primary); }
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+.text-error { color: var(--color-error); }
+
+.tracking-tight { letter-spacing: var(--letter-spacing-tight); }
+.tracking-wide { letter-spacing: var(--letter-spacing-wide); }
+.tracking-wider { letter-spacing: var(--letter-spacing-wider); }
+.tracking-widest { letter-spacing: var(--letter-spacing-widest); }
+
+.uppercase { text-transform: uppercase; }
+
+/* ── Scrollbar Styling ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-3);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}
+
+/* ── Selection ── */
+::selection {
+  background: var(--color-accent-primary);
+  color: var(--color-text-inverse);
+}
+
+/* ── Animations ── */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes flow-dash {
+  to { stroke-dashoffset: -20; }
+}
+
+@keyframes border-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes critical-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 0 0 var(--color-risk-critical-glow);
+  }
+  50% {
+    box-shadow: 0 0 16px 4px var(--color-risk-critical-glow);
+  }
+}
+
+@keyframes beacon {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(3); opacity: 0; }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s var(--transition-normal) both;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease both;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}

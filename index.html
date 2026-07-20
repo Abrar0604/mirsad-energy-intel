@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MIRSAD — AI-Powered Energy Supply Chain Resilience Platform. Real-time geopolitical risk monitoring, disruption scenario modeling, and adaptive procurement intelligence for India's energy security.">
+  <title>MIRSAD | مرصاد — Energy Supply Chain Resilience Platform</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'><i data-lucide="telescope"></i></text></svg>">
+
+  <!-- Leaflet.js -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css?v=2" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js?v=2"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js?v=2"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/design-system.css?v=2">
+  <link rel="stylesheet" href="css/layout.css?v=2">
+  <link rel="stylesheet" href="css/components.css?v=2">
+  <link rel="stylesheet" href="css/dashboard.css?v=2">
+  <link rel="stylesheet" href="css/map.css?v=2">
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ═══════ Top Bar ═══════ -->
+  <header>
+    <div class="top-bar">
+      <div class="top-bar__brand">
+        <div class="top-bar__logo"><i data-lucide="telescope"></i></div>
+        <span class="top-bar__title">MIRSAD</span>
+        <span class="top-bar__subtitle">مرصاد · AI Energy Intelligence</span>
+      </div>
+
+      <nav class="top-bar__nav">
+        <button class="nav-tab active" data-view="command-center" id="nav-command-center">
+          <span class="nav-tab__icon"><i data-lucide="radio"></i></span>
+          Command Center
+        </button>
+        <button class="nav-tab" data-view="risk-intel" id="nav-risk-intel">
+          <span class="nav-tab__icon"><i data-lucide="bar-chart-2"></i></span>
+          Risk Intelligence
+        </button>
+        <button class="nav-tab" data-view="scenarios" id="nav-scenarios">
+          <span class="nav-tab__icon"><i data-lucide="activity"></i></span>
+          Scenarios
+        </button>
+        <button class="nav-tab" data-view="procurement" id="nav-procurement">
+          <span class="nav-tab__icon"><i data-lucide="ship"></i></span>
+          Procurement
+        </button>
+        <button class="nav-tab" data-view="reserves" id="nav-reserves">
+          <span class="nav-tab__icon"><i data-lucide="database"></i></span>
+          Reserves
+        </button>
+      </nav>
+
+      <div class="top-bar__status" style="display: flex; gap: var(--space-3); align-items: center;">
+        <button id="btn-live-scan" class="btn btn--sm btn--primary" onclick="window.app.runLiveAnalysis()">
+          <i data-lucide="radio"></i> Scan Live Threats
+        </button>
+        <div style="display: flex; flex-direction: column; align-items: flex-end;">
+          <div class="status-indicator">
+            <div class="status-indicator__dot"></div>
+            <span>System Active</span>
+          </div>
+          <span style="font-family: var(--font-family-mono); font-size: var(--font-size-xs); color: var(--color-text-tertiary)" id="system-clock">--:--:-- IST</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Ticker -->
+    <div class="kpi-ticker" id="kpi-ticker">
+      <div class="kpi-item">
+        <span class="kpi-item__label">Loading...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════ Main Content ═══════ -->
+  <main class="main-content">
+
+    <!-- ════ View 1: Command Center ════ -->
+    <div class="view-panel active" id="command-center">
+      <div class="command-center">
+        
+        <!-- Map Area -->
+        <div class="command-center__map">
+          <div id="map-container" style="width: 100%; height: 100%;"></div>
+          
+          <!-- Layer Controls -->
+          <div class="layer-controls">
+            <div class="layer-toggle active" onclick="window.app.mapEngine?.toggleLayer('routes'); this.classList.toggle('active')">
+              <div class="layer-toggle__checkbox">✓</div>
+              <span><i data-lucide="ship"></i> Routes</span>
+            </div>
+            <div class="layer-toggle active" onclick="window.app.mapEngine?.toggleLayer('refineries'); this.classList.toggle('active')">
+              <div class="layer-toggle__checkbox">✓</div>
+              <span><i data-lucide="factory"></i> Refineries</span>
+            </div>
+            <div class="layer-toggle active" onclick="window.app.mapEngine?.toggleLayer('chokepoints'); this.classList.toggle('active')">
+              <div class="layer-toggle__checkbox">✓</div>
+              <span><i data-lucide="alert-triangle"></i> Chokepoints</span>
+            </div>
+            <div class="layer-toggle active" onclick="window.app.mapEngine?.toggleLayer('vessels'); this.classList.toggle('active')">
+              <div class="layer-toggle__checkbox">✓</div>
+              <span><i data-lucide="ship"></i> Vessels</span>
+            </div>
+            <div class="layer-toggle active" onclick="window.app.mapEngine?.toggleLayer('sprSites'); this.classList.toggle('active')">
+              <div class="layer-toggle__checkbox">✓</div>
+              <span><i data-lucide="database"></i> SPR Sites</span>
+            </div>
+            <div class="layer-toggle active" onclick="window.app.mapEngine?.toggleLayer('riskZones'); this.classList.toggle('active')">
+              <div class="layer-toggle__checkbox">✓</div>
+              <span><i data-lucide="alert-circle"></i> Risk Zones</span>
+            </div>
+          </div>
+
+          <!-- Map Legend -->
+          <div class="map-legend">
+            <div class="map-legend__title">Legend</div>
+            <div class="map-legend__item">
+              <div class="map-legend__color" style="background: var(--color-risk-low)"></div>
+              <span>Low Risk Route</span>
+            </div>
+            <div class="map-legend__item">
+              <div class="map-legend__color" style="background: var(--color-risk-moderate)"></div>
+              <span>Moderate Risk</span>
+            </div>
+            <div class="map-legend__item">
+              <div class="map-legend__color" style="background: var(--color-risk-elevated)"></div>
+              <span>Elevated Risk</span>
+            </div>
+            <div class="map-legend__item">
+              <div class="map-legend__color" style="background: var(--color-risk-high)"></div>
+              <span>High/Critical Risk</span>
+            </div>
+            <div class="map-legend__item" style="margin-top: 6px">
+              <div class="map-legend__dot" style="background: var(--color-info); border-color: var(--color-info)"></div>
+              <span>Refinery</span>
+            </div>
+            <div class="map-legend__item">
+              <div class="map-legend__dot" style="background: var(--color-accent-primary); border-color: var(--color-accent-secondary)"></div>
+              <span>SPR Site</span>
+            </div>
+            <div class="map-legend__item">
+              <div class="map-legend__dot" style="background: var(--color-risk-critical); border-color: var(--color-risk-high)"></div>
+              <span>Chokepoint</span>
+            </div>
+            <div class="map-legend__item">
+              <div class="map-legend__dot" style="background: var(--color-warning); border-color: var(--color-warning)"></div>
+              <span>Tanker</span>
+            </div>
+          </div>
+
+          <!-- Geo Info Box -->
+          <div class="geo-info-box">
+            <div class="geo-info-box__title"><i data-lucide="waves"></i> Zoom Presets</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px">
+              <button class="btn btn--sm btn--ghost" onclick="window.app.mapEngine?.zoomTo('global')"><i data-lucide="globe"></i> Global</button>
+              <button class="btn btn--sm btn--ghost" onclick="window.app.mapEngine?.zoomTo('india')"><i data-lucide="map-pin"></i> India</button>
+              <button class="btn btn--sm btn--ghost" onclick="window.app.mapEngine?.zoomTo('hormuz')"><i data-lucide="swords"></i> Hormuz</button>
+              <button class="btn btn--sm btn--ghost" onclick="window.app.mapEngine?.zoomTo('redsea')"><i data-lucide="zap"></i> Red Sea</button>
+              <button class="btn btn--sm btn--ghost" onclick="window.app.mapEngine?.zoomTo('persian-gulf')"><i data-lucide="sun"></i> Gulf</button>
+              <button class="btn btn--sm btn--ghost" onclick="window.app.mapEngine?.zoomTo('malacca')"><i data-lucide="globe"></i> Malacca</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="command-center__sidebar">
+          <!-- Risk Gauge -->
+          <div class="sidebar-section" style="text-align: center; padding: var(--space-5)">
+            <div class="sidebar-section__title"><i data-lucide="target"></i> MIRSAD RISK INDEX</div>
+            <div id="risk-gauge-container" style="display: flex; justify-content: center; margin: var(--space-3) 0"></div>
+          </div>
+
+          <!-- Pipeline Status -->
+          <div class="sidebar-section">
+            <div class="sidebar-section__title"><i data-lucide="zap"></i> Agent Pipeline</div>
+            <div class="pipeline-status" id="pipeline-status">
+              <div class="pipeline-stage"><div class="pipeline-stage__dot"><i data-lucide="radio"></i></div></div>
+            </div>
+          </div>
+
+          <!-- Agent Statuses -->
+          <div class="sidebar-section">
+            <div class="sidebar-section__title"><i data-lucide="bot"></i> Active Agents</div>
+            <div id="agent-statuses" style="display: flex; flex-direction: column; gap: var(--space-2)"></div>
+          </div>
+
+          <!-- Corridor Overview -->
+          <div class="sidebar-section">
+            <div class="sidebar-section__title"><i data-lucide="route"></i> Corridor Risk</div>
+            <div class="corridor-list" id="corridor-overview" style="max-height: 200px; overflow-y: auto"></div>
+          </div>
+
+          <!-- Alert Feed -->
+          <div class="sidebar-section" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; border-bottom: none">
+            <div class="sidebar-section__title"><i data-lucide="siren"></i> Alert Feed</div>
+            <div class="event-feed scroll-panel" id="alert-feed"></div>
+          </div>
+
+          <!-- Audit Trail -->
+          <div class="sidebar-section" style="max-height: 180px; overflow-y: auto; border-bottom: none">
+            <div class="sidebar-section__title"><i data-lucide="clipboard-list"></i> Audit Trail</div>
+            <div id="audit-trail"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ View 2: Risk Intelligence ════ -->
+    <div class="view-panel" id="risk-intel">
+      <div class="risk-intel">
+        <div class="risk-intel__header">
+          <div class="section-header">
+            <div class="section-header__title">
+              <span class="icon"><i data-lucide="bar-chart-2"></i></span>
+              <h2>Risk Intelligence Dashboard</h2>
+            </div>
+          </div>
+          <div id="risk-stats"></div>
+        </div>
+
+        <!-- Risk Trend -->
+        <div class="card">
+          <div class="card__header">
+            <span class="card__title"><i data-lucide="trending-up"></i> Risk Score Trend (18-month)</span>
+          </div>
+          <div class="card__body" style="height: 280px">
+            <div class="chart-container">
+              <canvas id="chart-risk-trend"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Import Sources -->
+        <div class="card">
+          <div class="card__header">
+            <span class="card__title"><i data-lucide="database"></i> Import Source Distribution</span>
+          </div>
+          <div class="card__body" style="height: 280px">
+            <div class="chart-container">
+              <canvas id="chart-import-sources"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Corridor Radar -->
+        <div class="card" style="grid-column: 1 / -1">
+          <div class="card__header">
+            <span class="card__title"><i data-lucide="target"></i> Corridor Risk Radar</span>
+          </div>
+          <div class="card__body" style="height: 320px">
+            <div class="chart-container">
+              <canvas id="chart-corridor-radar"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ View 3: Scenario Modeller ════ -->
+    <div class="view-panel" id="scenarios">
+      <div class="scenario-view">
+        <!-- Left: Controls -->
+        <div class="scenario-view__controls">
+          <div style="margin-bottom: var(--space-4)">
+            <h2 style="font-size: var(--font-size-xl); font-weight: 700; margin-bottom: var(--space-2)"><i data-lucide="activity"></i> Scenario Modeller</h2>
+            <p style="font-size: var(--font-size-xs); color: var(--color-text-tertiary)">Select a disruption scenario and run simulation to compute cascading impacts.</p>
+          </div>
+          
+          <div id="scenario-selector"></div>
+
+          <!-- Timeline -->
+          <div style="margin-top: var(--space-4)">
+            <div class="sidebar-section__title"><i data-lucide="calendar"></i> Event Timeline</div>
+            <div id="scenario-timeline" style="max-height: 300px; overflow-y: auto; margin-top: var(--space-2)"></div>
+          </div>
+
+          <!-- Assumptions -->
+          <div style="margin-top: var(--space-4)">
+            <div class="sidebar-section__title"><i data-lucide="pin"></i> Assumptions (Testable)</div>
+            <div id="scenario-assumptions" style="display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2)"></div>
+          </div>
+        </div>
+
+        <!-- Right: Results -->
+        <div class="scenario-view__results">
+          <!-- Impact Summary -->
+          <div class="scenario-result-card" style="grid-column: 1 / -1">
+            <div class="scenario-result-card__header">
+              <span class="scenario-result-card__title"><i data-lucide="zap"></i> Impact Summary</span>
+            </div>
+            <div class="scenario-result-card__body" style="height: auto">
+              <div id="scenario-impact-summary">
+                <div class="empty-state">
+                  <div class="empty-state__icon"><i data-lucide="activity"></i></div>
+                  <div class="empty-state__text">Select a scenario and run simulation</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Brent Price Trajectory -->
+          <div class="scenario-result-card">
+            <div class="scenario-result-card__header">
+              <span class="scenario-result-card__title"><i data-lucide="trending-up"></i> Brent Price Trajectory</span>
+            </div>
+            <div class="scenario-result-card__body">
+              <div class="chart-container">
+                <canvas id="chart-price-trajectory"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- GDP Impact -->
+          <div class="scenario-result-card">
+            <div class="scenario-result-card__header">
+              <span class="scenario-result-card__title"><i data-lucide="trending-down"></i> GDP Trajectory</span>
+            </div>
+            <div class="scenario-result-card__body">
+              <div class="chart-container">
+                <canvas id="chart-gdp-trajectory"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Refinery Utilization -->
+          <div class="scenario-result-card">
+            <div class="scenario-result-card__header">
+              <span class="scenario-result-card__title"><i data-lucide="factory"></i> Refinery Utilization Impact</span>
+            </div>
+            <div class="scenario-result-card__body">
+              <div class="chart-container">
+                <canvas id="chart-refinery-impact"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Supply Gap -->
+          <div class="scenario-result-card">
+            <div class="scenario-result-card__header">
+              <span class="scenario-result-card__title"><i data-lucide="bar-chart-2"></i> Supply Gap Projection (Monthly)</span>
+            </div>
+            <div class="scenario-result-card__body">
+              <div class="chart-container">
+                <canvas id="chart-supply-gap"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ View 4: Procurement ════ -->
+    <div class="view-panel" id="procurement">
+      <div class="procurement-view">
+        <div id="procurement-header"></div>
+        <div class="procurement-grid" id="procurement-grid"></div>
+      </div>
+    </div>
+
+    <!-- ════ View 5: Reserves ════ -->
+    <div class="view-panel" id="reserves">
+      <div class="reserves-view">
+        <div class="reserves-view__header">
+          <div class="section-header">
+            <div class="section-header__title">
+              <span class="icon"><i data-lucide="database"></i></span>
+              <h2>Strategic Petroleum Reserve Optimizer</h2>
+            </div>
+          </div>
+        </div>
+
+        <!-- Left Column -->
+        <div>
+          <!-- SPR Sites -->
+          <div class="card" style="margin-bottom: var(--space-4)">
+            <div class="card__header">
+              <span class="card__title"><i data-lucide="hard-hat"></i> SPR Sites</span>
+            </div>
+            <div class="card__body" id="spr-sites"></div>
+          </div>
+
+          <!-- Strategy Selector -->
+          <div class="card" style="margin-bottom: var(--space-4)">
+            <div class="card__header">
+              <span class="card__title"><i data-lucide="settings"></i> Drawdown Strategy</span>
+            </div>
+            <div class="card__body" id="strategy-selector"></div>
+          </div>
+
+          <!-- Recommendations -->
+          <div class="card">
+            <div class="card__header">
+              <span class="card__title"><i data-lucide="clipboard-list"></i> Recommendations</span>
+            </div>
+            <div class="card__body" id="reserve-recommendations"></div>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div>
+          <!-- Coverage Analysis -->
+          <div class="card" style="margin-bottom: var(--space-4)">
+            <div class="card__header">
+              <span class="card__title"><i data-lucide="bar-chart-2"></i> Coverage Analysis</span>
+            </div>
+            <div class="card__body" id="coverage-analysis"></div>
+          </div>
+
+          <!-- Drawdown Chart -->
+          <div class="card" style="margin-bottom: var(--space-4)">
+            <div class="card__header">
+              <span class="card__title"><i data-lucide="trending-down"></i> SPR Drawdown Projection</span>
+            </div>
+            <div class="card__body" style="height: 280px">
+              <div class="chart-container">
+                <canvas id="chart-spr-drawdown"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- International Benchmarks -->
+          <div class="card">
+            <div class="card__header">
+              <span class="card__title"><i data-lucide="globe"></i> International SPR Benchmarks</span>
+            </div>
+            <div class="card__body" id="spr-benchmarks"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Main App Script -->
+<script type="module" src="js/app.js?v=2"></script>
+
+</body>
+</html>

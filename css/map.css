@@ -1,0 +1,394 @@
+/* ============================================================
+   MIRSAD — Map Styles
+   Leaflet overrides, route styles, marker styles
+   ============================================================ */
+
+/* ── Leaflet Container ── */
+.leaflet-container {
+  background: var(--color-bg-primary) !important;
+  font-family: var(--font-family-ui) !important;
+}
+
+/* ── Leaflet Controls ── */
+.leaflet-control-zoom {
+  border: none !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+.leaflet-control-zoom a {
+  background: var(--color-surface-2) !important;
+  color: var(--color-text-secondary) !important;
+  border: 1px solid var(--color-border-default) !important;
+  width: 32px !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  font-size: var(--font-size-md) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: var(--color-surface-3) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.leaflet-control-zoom-in {
+  border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
+}
+
+.leaflet-control-zoom-out {
+  border-radius: 0 0 var(--radius-md) var(--radius-md) !important;
+  border-top: 1px solid var(--color-border-subtle) !important;
+}
+
+/* ── Attribution ── */
+.leaflet-control-attribution {
+  background: var(--color-surface-2) !important;
+  color: var(--color-text-muted) !important;
+  font-size: 9px !important;
+  padding: 2px 6px !important;
+  border-radius: var(--radius-sm) !important;
+}
+
+.leaflet-control-attribution a {
+  color: var(--color-text-tertiary) !important;
+}
+
+/* ── Custom Popups ── */
+.leaflet-popup-content-wrapper {
+  background: var(--color-surface-1) !important;
+  border: 1px solid var(--color-border-default) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-xl) !important;
+  color: var(--color-text-primary) !important;
+  padding: 0 !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  font-size: var(--font-size-sm) !important;
+  line-height: var(--line-height-normal) !important;
+  min-width: 220px;
+}
+
+.leaflet-popup-tip {
+  background: var(--color-surface-1) !important;
+  border: 1px solid var(--color-border-default) !important;
+  box-shadow: none !important;
+}
+
+.leaflet-popup-close-button {
+  color: var(--color-text-tertiary) !important;
+  font-size: 18px !important;
+  padding: 6px 8px 0 0 !important;
+}
+
+.leaflet-popup-close-button:hover {
+  color: var(--color-text-primary) !important;
+}
+
+/* ── Custom Popup Content ── */
+.map-popup {
+  padding: var(--space-3);
+}
+
+.map-popup__title {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-md);
+  margin-bottom: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.map-popup__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+  font-size: var(--font-size-xs);
+}
+
+.map-popup__label {
+  color: var(--color-text-tertiary);
+}
+
+.map-popup__value {
+  font-family: var(--font-family-mono);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.map-popup__divider {
+  height: 1px;
+  background: var(--color-border-subtle);
+  margin: var(--space-2) 0;
+}
+
+/* ── Custom Markers ── */
+.map-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid;
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-fast);
+  cursor: pointer;
+}
+
+.map-marker:hover {
+  transform: scale(1.2);
+  z-index: 1000 !important;
+}
+
+/* Refinery Markers */
+.marker-refinery {
+  width: 20px;
+  height: 20px;
+  background: var(--color-accent-primary);
+  border-color: var(--color-accent-secondary);
+  font-size: 10px;
+}
+
+.marker-refinery--stressed {
+  background: var(--color-risk-elevated);
+  border-color: var(--color-risk-high);
+  animation: critical-pulse 2s ease infinite;
+}
+
+/* Port Markers */
+.marker-port {
+  width: 16px;
+  height: 16px;
+  background: var(--color-info);
+  border-color: var(--color-info);
+  font-size: 8px;
+}
+
+/* SPR Site Markers */
+.marker-spr {
+  width: 22px;
+  height: 22px;
+  background: var(--color-accent-primary);
+  border-color: var(--color-accent-secondary);
+  font-size: 11px;
+}
+
+/* Chokepoint Markers */
+.marker-chokepoint {
+  width: 24px;
+  height: 24px;
+  background: rgba(239, 68, 68, 0.8);
+  border-color: var(--color-risk-high);
+  font-size: 12px;
+  animation: beacon 3s ease-out infinite;
+  position: relative;
+}
+
+.marker-chokepoint::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--color-risk-high);
+  opacity: 0.4;
+  animation: pulse-ring 2s ease infinite;
+}
+
+/* Vessel Markers */
+.marker-vessel {
+  width: 12px;
+  height: 12px;
+  background: var(--color-warning);
+  border-color: var(--color-warning);
+  font-size: 7px;
+  border-width: 1px;
+}
+
+/* ── Route Styles ── */
+.route-safe {
+  stroke: var(--color-risk-low);
+  stroke-opacity: 0.7;
+}
+
+.route-moderate {
+  stroke: var(--color-risk-moderate);
+  stroke-opacity: 0.7;
+}
+
+.route-elevated {
+  stroke: var(--color-risk-elevated);
+  stroke-opacity: 0.7;
+}
+
+.route-high {
+  stroke: var(--color-risk-high);
+  stroke-opacity: 0.8;
+}
+
+.route-critical {
+  stroke: var(--color-risk-critical);
+  stroke-opacity: 0.9;
+  stroke-dasharray: 8, 4;
+  animation: flow-dash 1s linear infinite;
+}
+
+/* ── Risk Zone Overlay ── */
+.risk-zone {
+  fill-opacity: 0.15;
+  stroke-width: 2;
+  stroke-dasharray: 6, 4;
+}
+
+.risk-zone--critical {
+  fill: var(--color-risk-critical);
+  stroke: var(--color-risk-critical);
+}
+
+.risk-zone--high {
+  fill: var(--color-risk-high);
+  stroke: var(--color-risk-high);
+}
+
+.risk-zone--elevated {
+  fill: var(--color-risk-elevated);
+  stroke: var(--color-risk-elevated);
+}
+
+/* ── Map Legend ── */
+.map-legend {
+  position: absolute;
+  bottom: var(--space-4);
+  left: var(--space-4);
+  z-index: var(--z-dropdown);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  min-width: 180px;
+}
+
+.map-legend__title {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wider);
+  margin-bottom: var(--space-2);
+}
+
+.map-legend__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 2px 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.map-legend__color {
+  width: 12px;
+  height: 3px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.map-legend__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1.5px solid;
+}
+
+/* ── Layer Controls ── */
+.layer-controls {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-4);
+  z-index: var(--z-dropdown);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.layer-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.layer-toggle:hover {
+  background: var(--color-surface-3);
+  color: var(--color-text-primary);
+}
+
+.layer-toggle.active {
+  color: var(--color-accent-primary);
+  border-color: var(--color-border-accent);
+}
+
+.layer-toggle__checkbox {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1.5px solid var(--color-border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  transition: all var(--transition-fast);
+}
+
+.layer-toggle.active .layer-toggle__checkbox {
+  background: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+  color: white;
+}
+
+/* ── Geospatial Info Box ── */
+.geo-info-box {
+  position: absolute;
+  bottom: var(--space-4);
+  right: var(--space-4);
+  z-index: var(--z-dropdown);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  min-width: 200px;
+}
+
+.geo-info-box__title {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-accent-primary);
+  margin-bottom: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.geo-info-box__row {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-xs);
+  padding: 2px 0;
+}
+
+.geo-info-box__label {
+  color: var(--color-text-tertiary);
+}
+
+.geo-info-box__value {
+  font-family: var(--font-family-mono);
+  font-weight: var(--font-weight-semibold);
+}
