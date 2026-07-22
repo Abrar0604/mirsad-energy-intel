@@ -10,21 +10,21 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔭</text></svg>">
 
   <!-- Leaflet.js -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css?v=6" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js?v=6"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css?v=7" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js?v=7"></script>
 
   <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js?v=6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js?v=7"></script>
 
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/design-system.css?v=6">
-  <link rel="stylesheet" href="css/layout.css?v=6">
-  <link rel="stylesheet" href="css/components.css?v=6">
-  <link rel="stylesheet" href="css/dashboard.css?v=6">
-  <link rel="stylesheet" href="css/map.css?v=6">
+  <link rel="stylesheet" href="css/design-system.css?v=7">
+  <link rel="stylesheet" href="css/layout.css?v=7">
+  <link rel="stylesheet" href="css/components.css?v=7">
+  <link rel="stylesheet" href="css/dashboard.css?v=7">
+  <link rel="stylesheet" href="css/map.css?v=7">
 </head>
 <body>
 
@@ -189,21 +189,59 @@
     <!-- ════ View 2: Risk Intelligence ════ -->
     <div class="view-panel" id="risk-intel">
       <div class="risk-intel">
-        
-        <!-- HEADER & TOP STATS -->
-        <div class="risk-intel__header">
-          <div class="section-header">
-            <div class="section-header__title">
+
+        <!-- Section 1: Header + Stats Row -->
+        <section class="ri-section">
+          <div class="ri-header">
+            <div class="ri-header__title">
               <span class="icon"><i data-lucide="bar-chart-2"></i></span>
               <h2>Risk Intelligence Dashboard</h2>
             </div>
           </div>
           <div id="risk-stats"></div>
-        </div>
+        </section>
 
-        <!-- NEW CORE METRICS (V2.0) -->
-        <div class="risk-intel__section risk-intel__section--full">
-          <div class="card">
+        <!-- Section 2: Charts Row (Risk Trend + Import Sources) -->
+        <section class="ri-section ri-charts-row">
+          <div class="card ri-card">
+            <div class="card__header">
+              <span class="card__title"><i data-lucide="trending-up"></i> Risk Score Trend</span>
+            </div>
+            <div class="card__body ri-chart-body">
+              <div class="chart-container">
+                <canvas id="chart-risk-trend"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="card ri-card">
+            <div class="card__header">
+              <span class="card__title"><i data-lucide="database"></i> Import Source Distribution</span>
+            </div>
+            <div class="card__body ri-chart-body">
+              <div class="chart-container">
+                <canvas id="chart-import-sources"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 3: Corridor Risk Radar (full width) -->
+        <section class="ri-section">
+          <div class="card ri-card">
+            <div class="card__header">
+              <span class="card__title"><i data-lucide="target"></i> Corridor Risk Radar</span>
+            </div>
+            <div class="card__body" style="height: 280px;">
+              <div class="chart-container">
+                <canvas id="chart-corridor-radar"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 4: Quantitative Supply Security Metrics -->
+        <section class="ri-section">
+          <div class="card ri-card">
             <div class="card__header">
               <span class="card__title"><i data-lucide="gauge"></i> Quantitative Supply Security Metrics</span>
               <span class="badge badge--accent" style="font-size: 9px;">LIVE FORMULAS</span>
@@ -216,10 +254,11 @@
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="risk-intel__section risk-intel__section--full">
-          <div class="card">
+        <!-- Section 5: Predictive Risk Trajectory -->
+        <section class="ri-section">
+          <div class="card ri-card">
             <div class="card__header">
               <span class="card__title"><i data-lucide="trending-up"></i> Predictive Risk Trajectory</span>
               <span class="badge badge--warning" style="font-size: 9px;">AI FORECAST</span>
@@ -232,62 +271,27 @@
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <!-- CHARTS ROW 1 -->
-        <div class="risk-intel__section risk-intel__section--split">
-          <div class="card">
-            <div class="card__header">
-              <span class="card__title"><i data-lucide="target"></i> Corridor Risk Radar</span>
-            </div>
-            <div class="card__body" style="height: 300px; display: flex; align-items: center; justify-content: center;">
-              <div class="chart-container" style="width: 100%; height: 100%;">
-                <canvas id="chart-corridor-radar"></canvas>
-              </div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card__header">
-              <span class="card__title"><i data-lucide="activity"></i> Risk Score Trend (18-month)</span>
-            </div>
-            <div class="card__body" style="height: 300px; display: flex; align-items: center; justify-content: center;">
-              <div class="chart-container" style="width: 100%; height: 100%;">
-                <canvas id="chart-risk-trend"></canvas>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ROW 2 -->
-        <div class="risk-intel__section risk-intel__section--split">
-          <div class="card">
+        <!-- Section 6: Intelligence Sources & RAG Grounding -->
+        <section class="ri-section">
+          <div class="card ri-card">
             <div class="card__header">
               <span class="card__title"><i data-lucide="book-open"></i> Intelligence Sources & RAG Grounding</span>
             </div>
-            <div class="card__body" style="height: 100%; display: flex; flex-direction: column;">
-              <div id="sources-indicator" class="sources-container" style="flex: 1;">
+            <div class="card__body">
+              <div id="sources-indicator" class="sources-container">
                 <div class="metric-card metric-card--loading">
                   <span class="metric-card__label">No analysis data yet...</span>
                 </div>
               </div>
             </div>
           </div>
-
-          <div class="card">
-            <div class="card__header">
-              <span class="card__title"><i data-lucide="database"></i> Import Source Distribution</span>
-            </div>
-            <div class="card__body" style="height: 350px; display: flex; align-items: center; justify-content: center;">
-              <div class="chart-container" style="width: 100%; height: 100%;">
-                <canvas id="chart-import-sources"></canvas>
-              </div>
-            </div>
-          </div>
-        </div>
+        </section>
 
       </div>
     </div>
+
 
     <!-- ════ View 3: Scenario Modeller ════ -->
     <div class="view-panel" id="scenarios">
@@ -466,7 +470,7 @@
 </div>
 
 <!-- Main App Script -->
-<script type="module" src="js/app.js?v=6"></script>
+<script type="module" src="js/app.js?v=7"></script>
 
 </body>
 </html>

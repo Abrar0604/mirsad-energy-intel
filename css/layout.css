@@ -365,29 +365,63 @@ header {
 .risk-intel {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  padding: var(--space-4);
+  gap: var(--space-3);
+  padding: var(--space-3);
   overflow-y: auto;
+  overflow-x: hidden;
   min-height: 0;
+  height: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
-.risk-intel__header {
+/* Smooth scrollbar styling */
+.risk-intel::-webkit-scrollbar {
+  width: 6px;
+}
+.risk-intel::-webkit-scrollbar-track {
+  background: transparent;
+}
+.risk-intel::-webkit-scrollbar-thumb {
+  background: var(--color-border-subtle);
+  border-radius: 3px;
+}
+
+.ri-section {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.ri-header {
   margin-bottom: var(--space-2);
 }
-
-.risk-intel__section {
+.ri-header__title {
   display: flex;
-  gap: var(--space-4);
-  width: 100%;
+  align-items: center;
+  gap: var(--space-2);
+}
+.ri-header__title h2 {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  margin: 0;
 }
 
-.risk-intel__section--full > * {
-  flex: 1;
+/* Charts side-by-side row */
+.ri-charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
 }
 
-.risk-intel__section--split > * {
+.ri-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ri-chart-body {
+  min-height: 200px;
+  max-height: 240px;
   flex: 1;
-  min-width: 0; /* Prevents flex children from overflowing */
 }
 
 /* ── Scenario Modeller Layout ── */
@@ -526,8 +560,14 @@ header {
   .command-center {
     grid-template-columns: 1fr 260px;
   }
-  .risk-intel__section--split {
-    flex-direction: column;
+  .ri-charts-row {
+    grid-template-columns: 1fr;
+  }
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .trajectory-container {
+    grid-template-columns: 1fr !important;
   }
   .scenario-view__results {
     grid-template-columns: 1fr;
@@ -602,5 +642,20 @@ header {
   .scenario-view__controls {
     border-right: none;
     border-bottom: 1px solid var(--color-border-subtle);
+  }
+}
+
+@media (max-width: 480px) {
+  .metrics-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .ri-charts-row {
+    grid-template-columns: 1fr;
+  }
+  .sources-summary {
+    flex-direction: column;
+  }
+  .vessel-signals {
+    grid-template-columns: 1fr;
   }
 }
