@@ -3,12 +3,22 @@
    Grid layout, navigation, responsive design
    ============================================================ */
 
+header {
+  width: 100%;
+  max-width: 100vw;
+  min-width: 0;
+  overflow: hidden;
+}
+
 /* ── Main App Shell ── */
 .app-shell {
   display: grid;
   grid-template-rows: auto 1fr;
   height: 100vh;
   width: 100vw;
+  max-width: 100vw;
+  min-width: 0;
+  min-height: 0;
   overflow: hidden;
   background: var(--color-bg-primary);
 }
@@ -24,6 +34,10 @@
   border-bottom: 1px solid var(--color-border-subtle);
   z-index: var(--z-sticky);
   position: relative;
+  width: 100%;
+  max-width: 100vw;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .top-bar::after {
@@ -39,7 +53,8 @@
 .top-bar__brand {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
+  flex-shrink: 0;
 }
 
 .top-bar__logo {
@@ -79,6 +94,14 @@
   align-items: center;
   gap: var(--space-1);
   height: 100%;
+  overflow-x: auto;
+  flex: 1;
+  min-width: 0;
+  justify-content: center;
+}
+
+.top-bar__nav::-webkit-scrollbar {
+  display: none;
 }
 
 .nav-tab {
@@ -134,7 +157,8 @@
 .top-bar__status {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
+  flex-shrink: 0;
 }
 
 .status-indicator {
@@ -167,11 +191,14 @@
   display: flex;
   align-items: center;
   height: 36px;
-  padding: 0 var(--space-5);
+  padding: 0 var(--space-3);
   background: var(--color-bg-secondary);
   border-bottom: 1px solid var(--color-border-subtle);
-  gap: var(--space-6);
+  gap: var(--space-4);
   overflow-x: auto;
+  width: 100%;
+  max-width: 100vw;
+  min-width: 0;
 }
 
 .kpi-ticker::-webkit-scrollbar {
@@ -232,6 +259,8 @@
   position: relative;
   min-height: 0;
   min-width: 0;
+  width: 100%;
+  max-width: 100vw;
 }
 
 /* ── View Panels ── */
@@ -242,6 +271,8 @@
   overflow: hidden;
   min-height: 0;
   min-width: 0;
+  width: 100%;
+  max-width: 100vw;
 }
 
 .view-panel.active {
@@ -252,10 +283,12 @@
 /* ── Command Center Layout ── */
 .command-center {
   display: grid;
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: minmax(0, 1fr) 340px;
   grid-template-rows: 1fr;
   gap: 0;
   height: 100%;
+  width: 100%;
+  max-width: 100vw;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
