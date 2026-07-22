@@ -301,10 +301,23 @@ class MirsadApp {
     }
   }
 
-  restoreCachedAnalysis() {
-    const cached = this.getCachedAnalysis();
+  async restoreCachedAnalysis() {
+    let cached = this.getCachedAnalysis();
+    
+    if (!cached) {
+      try {
+        const fallbackResp = await fetch('js/data/fallback-analysis.json');
+        if (fallbackResp.ok) {
+          cached = await fallbackResp.json();
+          cached._cached_at = new Date().toISOString();
+        }
+      } catch (e) {
+        console.warn("Failed to load initial fallback data:", e);
+      }
+    }
+
     if (cached) {
-      console.log(`[MIRSAD] Restoring cached analysis from ${cached._cached_at}`);
+      console.log(`[MIRSAD] Restoring cached/fallback analysis from ${cached._cached_at}`);
       this.lastLiveData = cached;
       this.renderAnalysisData(cached);
     }
