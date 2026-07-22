@@ -221,19 +221,31 @@ class MirsadApp {
         );
       }
     } catch (error) {
-      // On API failure, try to use cached data
-      const cached = this.getCachedAnalysis();
+      let cached = this.getCachedAnalysis();
+      
+      if (!cached) {
+        try {
+          const fallbackResp = await fetch('js/data/fallback-analysis.json');
+          if (fallbackResp.ok) {
+            cached = await fallbackResp.json();
+            cached._cached_at = new Date().toISOString(); // Mark as fallback
+          }
+        } catch (fallbackError) {
+          console.error("Fallback load failed:", fallbackError);
+        }
+      }
+
       if (cached) {
         this.lastLiveData = cached;
         this.renderAnalysisData(cached);
         const cacheTime = cached._cached_at ? new Date(cached._cached_at).toLocaleTimeString() : 'unknown';
         this.showToast(
-          'Live analysis failed',
-          `Displaying previously cached data from ${cacheTime}.\nError: ${error.message}`,
+          'Live analysis unavailable',
+          `Render backend is sleeping. Displaying fallback intelligence data.\nError: ${error.message}`,
           'warning'
         );
       } else {
-        this.showToast('Analysis Error', `Live analysis failed: ${error.message}\nNo cached data available.`, 'error');
+        this.showToast('Analysis Error', `Live analysis failed: ${error.message}\nNo fallback data available.`, 'error');
       }
     } finally {
       if (btn) {
