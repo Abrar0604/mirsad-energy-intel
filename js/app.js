@@ -97,6 +97,22 @@ class MirsadApp {
         tab.classList.add('active');
       });
     });
+
+    // Command Center sidebar tabs
+    const sidebarTabs = document.querySelectorAll('.sidebar-tab');
+    sidebarTabs.forEach(sbTab => {
+      sbTab.addEventListener('click', () => {
+        const targetTab = sbTab.dataset.sidebarTab;
+        sidebarTabs.forEach(t => t.classList.remove('active'));
+        sbTab.classList.add('active');
+
+        document.querySelectorAll('.sidebar-tab-panel').forEach(panel => {
+          panel.classList.remove('active');
+        });
+        const targetPanel = document.getElementById(`sb-panel-${targetTab}`);
+        if (targetPanel) targetPanel.classList.add('active');
+      });
+    });
   }
 
   switchView(viewId) {

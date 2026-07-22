@@ -254,141 +254,112 @@
   stroke: var(--color-risk-elevated);
 }
 
-/* ── Map Legend ── */
-.map-legend {
+/* ── Floating Map Bar & Presets ── */
+.map-floating-bar {
   position: absolute;
-  bottom: var(--space-4);
-  left: var(--space-4);
+  top: var(--space-3);
+  left: var(--space-3);
+  right: var(--space-3);
   z-index: var(--z-dropdown);
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-lg);
-  padding: var(--space-3);
-  min-width: 180px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  pointer-events: none;
 }
 
-.map-legend__title {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
+.map-preset-pills,
+.map-layer-toggles {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-full);
+  padding: 4px var(--space-2);
+  box-shadow: var(--shadow-sm);
+  pointer-events: auto;
+}
+
+.layer-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
   color: var(--color-text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wider);
-  margin-bottom: var(--space-2);
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.layer-chip:hover {
+  color: var(--color-text-primary);
+  background: var(--color-surface-3);
+}
+
+.layer-chip.active {
+  color: var(--color-accent-primary);
+  background: var(--color-accent-primary-dim);
+  border-color: var(--color-accent-primary);
+}
+
+/* ── Collapsible Legend Pill ── */
+.map-legend-pill {
+  position: absolute;
+  bottom: var(--space-3);
+  left: var(--space-3);
+  z-index: var(--z-dropdown);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  max-width: 260px;
+}
+
+.map-legend-pill__header {
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  user-select: none;
+}
+
+.map-legend-pill__content {
+  padding: 8px 12px;
+  border-top: 1px solid var(--color-border-subtle);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 8px;
 }
 
 .map-legend__item {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: 2px 0;
-  font-size: var(--font-size-xs);
+  gap: 6px;
+  font-size: 10px;
   color: var(--color-text-secondary);
 }
 
 .map-legend__color {
-  width: 12px;
+  width: 10px;
   height: 3px;
   border-radius: var(--radius-full);
   flex-shrink: 0;
 }
 
 .map-legend__dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
-  border: 1.5px solid;
-}
-
-/* ── Layer Controls ── */
-.layer-controls {
-  position: absolute;
-  top: var(--space-4);
-  left: var(--space-4);
-  z-index: var(--z-dropdown);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.layer-toggle {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-md);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-xs);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-}
-
-.layer-toggle:hover {
-  background: var(--color-surface-3);
-  color: var(--color-text-primary);
-}
-
-.layer-toggle.active {
-  color: var(--color-accent-primary);
-  border-color: var(--color-border-accent);
-}
-
-.layer-toggle__checkbox {
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
-  border: 1.5px solid var(--color-border-strong);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 9px;
-  transition: all var(--transition-fast);
-}
-
-.layer-toggle.active .layer-toggle__checkbox {
-  background: var(--color-accent-primary);
-  border-color: var(--color-accent-primary);
-  color: white;
-}
-
-/* ── Geospatial Info Box ── */
-.geo-info-box {
-  position: absolute;
-  bottom: var(--space-4);
-  right: var(--space-4);
-  z-index: var(--z-dropdown);
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-lg);
-  padding: var(--space-3) var(--space-4);
-  min-width: 200px;
-}
-
-.geo-info-box__title {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-accent-primary);
-  margin-bottom: var(--space-2);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.geo-info-box__row {
-  display: flex;
-  justify-content: space-between;
-  font-size: var(--font-size-xs);
-  padding: 2px 0;
-}
-
-.geo-info-box__label {
-  color: var(--color-text-tertiary);
-}
-
-.geo-info-box__value {
-  font-family: var(--font-family-mono);
-  font-weight: var(--font-weight-semibold);
 }

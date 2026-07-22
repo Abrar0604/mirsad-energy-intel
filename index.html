@@ -10,21 +10,21 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'><i data-lucide="telescope"></i></text></svg>">
 
   <!-- Leaflet.js -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css?v=2" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js?v=2"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css?v=4" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js?v=4"></script>
 
   <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js?v=2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js?v=4"></script>
 
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/design-system.css?v=2">
-  <link rel="stylesheet" href="css/layout.css?v=2">
-  <link rel="stylesheet" href="css/components.css?v=2">
-  <link rel="stylesheet" href="css/dashboard.css?v=2">
-  <link rel="stylesheet" href="css/map.css?v=2">
+  <link rel="stylesheet" href="css/design-system.css?v=4">
+  <link rel="stylesheet" href="css/layout.css?v=4">
+  <link rel="stylesheet" href="css/components.css?v=4">
+  <link rel="stylesheet" href="css/dashboard.css?v=4">
+  <link rel="stylesheet" href="css/map.css?v=4">
 </head>
 <body>
 
@@ -95,123 +95,87 @@
         <div class="command-center__map">
           <div id="map-container" style="width: 100%; height: 100%;"></div>
           
-          <!-- Layer Controls -->
-          <div class="layer-controls">
-            <div class="layer-toggle active" onclick="window.app.mapEngine?.toggleLayer('routes'); this.classList.toggle('active')">
-              <div class="layer-toggle__checkbox">✓</div>
-              <span><i data-lucide="ship"></i> Routes</span>
+          <!-- Sleek Floating Map Bar -->
+          <div class="map-floating-bar">
+            <div class="map-preset-pills">
+              <button class="btn btn--xs btn--ghost" onclick="window.app.mapEngine?.zoomTo('global')"><i data-lucide="globe"></i> Global</button>
+              <button class="btn btn--xs btn--ghost" onclick="window.app.mapEngine?.zoomTo('india')"><i data-lucide="map-pin"></i> India</button>
+              <button class="btn btn--xs btn--ghost" onclick="window.app.mapEngine?.zoomTo('hormuz')"><i data-lucide="swords"></i> Hormuz</button>
+              <button class="btn btn--xs btn--ghost" onclick="window.app.mapEngine?.zoomTo('redsea')"><i data-lucide="zap"></i> Red Sea</button>
             </div>
-            <div class="layer-toggle active" onclick="window.app.mapEngine?.toggleLayer('refineries'); this.classList.toggle('active')">
-              <div class="layer-toggle__checkbox">✓</div>
-              <span><i data-lucide="factory"></i> Refineries</span>
-            </div>
-            <div class="layer-toggle active" onclick="window.app.mapEngine?.toggleLayer('chokepoints'); this.classList.toggle('active')">
-              <div class="layer-toggle__checkbox">✓</div>
-              <span><i data-lucide="alert-triangle"></i> Chokepoints</span>
-            </div>
-            <div class="layer-toggle active" onclick="window.app.mapEngine?.toggleLayer('vessels'); this.classList.toggle('active')">
-              <div class="layer-toggle__checkbox">✓</div>
-              <span><i data-lucide="ship"></i> Vessels</span>
-            </div>
-            <div class="layer-toggle active" onclick="window.app.mapEngine?.toggleLayer('sprSites'); this.classList.toggle('active')">
-              <div class="layer-toggle__checkbox">✓</div>
-              <span><i data-lucide="database"></i> SPR Sites</span>
-            </div>
-            <div class="layer-toggle active" onclick="window.app.mapEngine?.toggleLayer('riskZones'); this.classList.toggle('active')">
-              <div class="layer-toggle__checkbox">✓</div>
-              <span><i data-lucide="alert-circle"></i> Risk Zones</span>
+            <div class="map-layer-toggles">
+              <button class="layer-chip active" onclick="window.app.mapEngine?.toggleLayer('routes'); this.classList.toggle('active')"><i data-lucide="ship"></i> Routes</button>
+              <button class="layer-chip active" onclick="window.app.mapEngine?.toggleLayer('refineries'); this.classList.toggle('active')"><i data-lucide="factory"></i> Refineries</button>
+              <button class="layer-chip active" onclick="window.app.mapEngine?.toggleLayer('chokepoints'); this.classList.toggle('active')"><i data-lucide="alert-triangle"></i> Chokepoints</button>
+              <button class="layer-chip active" onclick="window.app.mapEngine?.toggleLayer('vessels'); this.classList.toggle('active')"><i data-lucide="anchor"></i> Vessels</button>
+              <button class="layer-chip active" onclick="window.app.mapEngine?.toggleLayer('sprSites'); this.classList.toggle('active')"><i data-lucide="database"></i> SPR</button>
+              <button class="layer-chip active" onclick="window.app.mapEngine?.toggleLayer('riskZones'); this.classList.toggle('active')"><i data-lucide="alert-circle"></i> Zones</button>
             </div>
           </div>
 
-          <!-- Map Legend -->
-          <div class="map-legend">
-            <div class="map-legend__title">Legend</div>
-            <div class="map-legend__item">
-              <div class="map-legend__color" style="background: var(--color-risk-low)"></div>
-              <span>Low Risk Route</span>
+          <!-- Compact Collapsible Legend -->
+          <details class="map-legend-pill">
+            <summary class="map-legend-pill__header"><i data-lucide="layers"></i> Legend</summary>
+            <div class="map-legend-pill__content">
+              <div class="map-legend__item"><div class="map-legend__color" style="background: var(--color-risk-low)"></div><span>Low Risk Route</span></div>
+              <div class="map-legend__item"><div class="map-legend__color" style="background: var(--color-risk-moderate)"></div><span>Moderate Risk</span></div>
+              <div class="map-legend__item"><div class="map-legend__color" style="background: var(--color-risk-elevated)"></div><span>Elevated Risk</span></div>
+              <div class="map-legend__item"><div class="map-legend__color" style="background: var(--color-risk-high)"></div><span>High Risk</span></div>
+              <div class="map-legend__item"><div class="map-legend__dot" style="background: var(--color-info)"></div><span>Refinery</span></div>
+              <div class="map-legend__item"><div class="map-legend__dot" style="background: var(--color-accent-primary)"></div><span>SPR Site</span></div>
+              <div class="map-legend__item"><div class="map-legend__dot" style="background: var(--color-risk-critical)"></div><span>Chokepoint</span></div>
             </div>
-            <div class="map-legend__item">
-              <div class="map-legend__color" style="background: var(--color-risk-moderate)"></div>
-              <span>Moderate Risk</span>
-            </div>
-            <div class="map-legend__item">
-              <div class="map-legend__color" style="background: var(--color-risk-elevated)"></div>
-              <span>Elevated Risk</span>
-            </div>
-            <div class="map-legend__item">
-              <div class="map-legend__color" style="background: var(--color-risk-high)"></div>
-              <span>High/Critical Risk</span>
-            </div>
-            <div class="map-legend__item" style="margin-top: 6px">
-              <div class="map-legend__dot" style="background: var(--color-info); border-color: var(--color-info)"></div>
-              <span>Refinery</span>
-            </div>
-            <div class="map-legend__item">
-              <div class="map-legend__dot" style="background: var(--color-accent-primary); border-color: var(--color-accent-secondary)"></div>
-              <span>SPR Site</span>
-            </div>
-            <div class="map-legend__item">
-              <div class="map-legend__dot" style="background: var(--color-risk-critical); border-color: var(--color-risk-high)"></div>
-              <span>Chokepoint</span>
-            </div>
-            <div class="map-legend__item">
-              <div class="map-legend__dot" style="background: var(--color-warning); border-color: var(--color-warning)"></div>
-              <span>Tanker</span>
-            </div>
-          </div>
-
-          <!-- Geo Info Box -->
-          <div class="geo-info-box">
-            <div class="geo-info-box__title"><i data-lucide="waves"></i> Zoom Presets</div>
-            <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px">
-              <button class="btn btn--sm btn--ghost" onclick="window.app.mapEngine?.zoomTo('global')"><i data-lucide="globe"></i> Global</button>
-              <button class="btn btn--sm btn--ghost" onclick="window.app.mapEngine?.zoomTo('india')"><i data-lucide="map-pin"></i> India</button>
-              <button class="btn btn--sm btn--ghost" onclick="window.app.mapEngine?.zoomTo('hormuz')"><i data-lucide="swords"></i> Hormuz</button>
-              <button class="btn btn--sm btn--ghost" onclick="window.app.mapEngine?.zoomTo('redsea')"><i data-lucide="zap"></i> Red Sea</button>
-              <button class="btn btn--sm btn--ghost" onclick="window.app.mapEngine?.zoomTo('persian-gulf')"><i data-lucide="sun"></i> Gulf</button>
-              <button class="btn btn--sm btn--ghost" onclick="window.app.mapEngine?.zoomTo('malacca')"><i data-lucide="globe"></i> Malacca</button>
-            </div>
-          </div>
+          </details>
         </div>
 
-        <!-- Right Sidebar -->
+        <!-- Right Tabbed Sidebar -->
         <div class="command-center__sidebar">
-          <!-- Risk Gauge -->
-          <div class="sidebar-section" style="text-align: center; padding: var(--space-5)">
-            <div class="sidebar-section__title"><i data-lucide="target"></i> MIRSAD RISK INDEX</div>
-            <div id="risk-gauge-container" style="display: flex; justify-content: center; margin: var(--space-3) 0"></div>
+          <!-- Sidebar Tabs Navigation -->
+          <div class="sidebar-tabs">
+            <button class="sidebar-tab active" data-sidebar-tab="overview"><i data-lucide="target"></i> Overview</button>
+            <button class="sidebar-tab" data-sidebar-tab="alerts"><i data-lucide="siren"></i> Alerts</button>
+            <button class="sidebar-tab" data-sidebar-tab="corridors"><i data-lucide="route"></i> Corridors & Audit</button>
           </div>
 
-          <!-- Pipeline Status -->
-          <div class="sidebar-section">
-            <div class="sidebar-section__title"><i data-lucide="zap"></i> Agent Pipeline</div>
-            <div class="pipeline-status" id="pipeline-status">
-              <div class="pipeline-stage"><div class="pipeline-stage__dot"><i data-lucide="radio"></i></div></div>
+          <!-- Tab 1: Overview -->
+          <div class="sidebar-tab-panel active" id="sb-panel-overview">
+            <div class="sidebar-section" style="text-align: center; padding: var(--space-3) var(--space-4);">
+              <div class="sidebar-section__title"><i data-lucide="target"></i> MIRSAD RISK INDEX</div>
+              <div id="risk-gauge-container" style="display: flex; justify-content: center; margin: var(--space-2) 0;"></div>
+            </div>
+
+            <div class="sidebar-section">
+              <div class="sidebar-section__title"><i data-lucide="zap"></i> Agent Pipeline</div>
+              <div class="pipeline-status" id="pipeline-status">
+                <div class="pipeline-stage"><div class="pipeline-stage__dot"><i data-lucide="radio"></i></div></div>
+              </div>
+            </div>
+
+            <div class="sidebar-section">
+              <div class="sidebar-section__title"><i data-lucide="bot"></i> Active Agents</div>
+              <div id="agent-statuses" style="display: flex; flex-direction: column; gap: var(--space-2);"></div>
             </div>
           </div>
 
-          <!-- Agent Statuses -->
-          <div class="sidebar-section">
-            <div class="sidebar-section__title"><i data-lucide="bot"></i> Active Agents</div>
-            <div id="agent-statuses" style="display: flex; flex-direction: column; gap: var(--space-2)"></div>
+          <!-- Tab 2: Live Alerts -->
+          <div class="sidebar-tab-panel" id="sb-panel-alerts">
+            <div class="sidebar-section" style="flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; padding: var(--space-3);">
+              <div class="sidebar-section__title"><i data-lucide="siren"></i> Live Intelligence Alert Feed</div>
+              <div class="event-feed scroll-panel" id="alert-feed"></div>
+            </div>
           </div>
 
-          <!-- Corridor Overview -->
-          <div class="sidebar-section">
-            <div class="sidebar-section__title"><i data-lucide="route"></i> Corridor Risk</div>
-            <div class="corridor-list" id="corridor-overview" style="max-height: 200px; overflow-y: auto"></div>
-          </div>
+          <!-- Tab 3: Corridors & Audit -->
+          <div class="sidebar-tab-panel" id="sb-panel-corridors">
+            <div class="sidebar-section">
+              <div class="sidebar-section__title"><i data-lucide="route"></i> Corridor Risk Breakdown</div>
+              <div class="corridor-list" id="corridor-overview"></div>
+            </div>
 
-          <!-- Alert Feed -->
-          <div class="sidebar-section" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; border-bottom: none">
-            <div class="sidebar-section__title"><i data-lucide="siren"></i> Alert Feed</div>
-            <div class="event-feed scroll-panel" id="alert-feed"></div>
-          </div>
-
-          <!-- Audit Trail -->
-          <div class="sidebar-section" style="max-height: 180px; overflow-y: auto; border-bottom: none">
-            <div class="sidebar-section__title"><i data-lucide="clipboard-list"></i> Audit Trail</div>
-            <div id="audit-trail"></div>
+            <div class="sidebar-section" style="flex: 1; overflow-y: auto;">
+              <div class="sidebar-section__title"><i data-lucide="clipboard-list"></i> System Audit Trail</div>
+              <div id="audit-trail"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -235,7 +199,7 @@
           <div class="card__header">
             <span class="card__title"><i data-lucide="trending-up"></i> Risk Score Trend (18-month)</span>
           </div>
-          <div class="card__body" style="height: 280px">
+          <div class="card__body" style="min-height: 180px; flex: 1;">
             <div class="chart-container">
               <canvas id="chart-risk-trend"></canvas>
             </div>
@@ -247,7 +211,7 @@
           <div class="card__header">
             <span class="card__title"><i data-lucide="database"></i> Import Source Distribution</span>
           </div>
-          <div class="card__body" style="height: 280px">
+          <div class="card__body" style="min-height: 180px; flex: 1;">
             <div class="chart-container">
               <canvas id="chart-import-sources"></canvas>
             </div>
@@ -423,7 +387,7 @@
             <div class="card__header">
               <span class="card__title"><i data-lucide="trending-down"></i> SPR Drawdown Projection</span>
             </div>
-            <div class="card__body" style="height: 280px">
+            <div class="card__body" style="min-height: 180px; flex: 1;">
               <div class="chart-container">
                 <canvas id="chart-spr-drawdown"></canvas>
               </div>
@@ -445,7 +409,7 @@
 </div>
 
 <!-- Main App Script -->
-<script type="module" src="js/app.js?v=2"></script>
+<script type="module" src="js/app.js?v=4"></script>
 
 </body>
 </html>
