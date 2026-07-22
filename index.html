@@ -63,6 +63,11 @@
       </nav>
 
       <div class="top-bar__status" style="display: flex; gap: var(--space-3); align-items: center;">
+        <!-- LLM Pool Health Badge -->
+        <div id="llm-pool-badge" class="llm-pool-badge" title="LLM Pool Status">
+          <i data-lucide="cpu"></i>
+          <span id="llm-pool-text">LLM Pool: —</span>
+        </div>
         <button id="btn-live-scan" class="btn btn--sm btn--primary" onclick="window.app.runLiveAnalysis()">
           <i data-lucide="radio"></i> Scan Live Threats
         </button>
@@ -229,6 +234,51 @@
             </div>
           </div>
         </div>
+
+        <!-- ═══ NEW: Composite Metrics Dashboard ═══ -->
+        <div class="card" style="grid-column: 1 / -1">
+          <div class="card__header">
+            <span class="card__title"><i data-lucide="gauge"></i> Quantitative Supply Security Metrics</span>
+            <span class="badge badge--accent" style="font-size: 9px;">LIVE FORMULAS</span>
+          </div>
+          <div class="card__body">
+            <div id="metrics-dashboard" class="metrics-grid">
+              <div class="metric-card metric-card--loading">
+                <span class="metric-card__label">Run analysis to compute metrics...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ NEW: Risk Trajectory Forecast ═══ -->
+        <div class="card" style="grid-column: 1 / -1">
+          <div class="card__header">
+            <span class="card__title"><i data-lucide="trending-up"></i> Predictive Risk Trajectory</span>
+            <span class="badge badge--warning" style="font-size: 9px;">AI FORECAST</span>
+          </div>
+          <div class="card__body">
+            <div id="trajectory-forecast" class="trajectory-container">
+              <div class="metric-card metric-card--loading">
+                <span class="metric-card__label">Run analysis to generate forecast...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ NEW: Sources Consulted & Facts Retrieved ═══ -->
+        <div class="card" style="grid-column: 1 / -1">
+          <div class="card__header">
+            <span class="card__title"><i data-lucide="book-open"></i> Intelligence Sources & RAG Grounding</span>
+          </div>
+          <div class="card__body">
+            <div id="sources-indicator" class="sources-container">
+              <div class="metric-card metric-card--loading">
+                <span class="metric-card__label">No analysis data yet...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 

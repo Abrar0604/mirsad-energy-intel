@@ -368,3 +368,322 @@
   color: var(--color-info);
   cursor: help;
 }
+
+
+/* ══════════════════════════════════════════════════
+   SOPHISTICATION PASS: New Component Styles
+   ══════════════════════════════════════════════════ */
+
+/* ── LLM Pool Health Badge (Top Bar) ── */
+.llm-pool-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-family: var(--font-family-mono);
+  color: #10b981;
+  cursor: help;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+.llm-pool-badge svg { width: 12px; height: 12px; }
+.llm-pool-badge.llm-pool-badge--degraded {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
+}
+.llm-pool-badge.llm-pool-badge--down {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+/* ── Metrics Dashboard Grid ── */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-3);
+}
+
+.metric-card {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+.metric-card--green::before { background: linear-gradient(90deg, #10b981, #34d399); }
+.metric-card--amber::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.metric-card--red::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+.metric-card--blue::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+
+.metric-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+.metric-card__name {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-secondary);
+}
+.metric-card__badge {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.metric-card__badge--green { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.metric-card__badge--amber { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+.metric-card__badge--red { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.metric-card__badge--blue { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+
+.metric-card__value {
+  font-size: 28px;
+  font-weight: 800;
+  font-family: var(--font-family-mono);
+  line-height: 1.1;
+  margin-bottom: var(--space-1);
+}
+.metric-card__value--green { color: #10b981; }
+.metric-card__value--amber { color: #f59e0b; }
+.metric-card__value--red { color: #ef4444; }
+.metric-card__value--blue { color: #3b82f6; }
+
+.metric-card__formula {
+  font-size: 10px;
+  font-family: var(--font-family-mono);
+  color: var(--color-text-tertiary);
+  background: rgba(255,255,255,0.03);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  margin-top: var(--space-2);
+  border: 1px solid var(--color-border-subtle);
+  word-break: break-all;
+}
+
+.metric-card__interpretation {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-2);
+  line-height: 1.5;
+}
+
+.metric-card--loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+}
+
+/* ── Trajectory Forecast ── */
+.trajectory-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-3);
+}
+
+.trajectory-card {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+.trajectory-card__title {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.trajectory-card__score {
+  font-size: 32px;
+  font-weight: 800;
+  font-family: var(--font-family-mono);
+}
+.trajectory-card__direction {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+.trajectory-card__direction--increasing {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+.trajectory-card__direction--decreasing {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+.trajectory-card__direction--stable {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+.trajectory-card__confidence {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  margin-top: var(--space-2);
+}
+.confidence-bar {
+  height: 4px;
+  background: var(--color-surface-3);
+  border-radius: 2px;
+  margin-top: 4px;
+  overflow: hidden;
+}
+.confidence-bar__fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  transition: width 0.5s ease;
+}
+
+/* Signal Components */
+.signal-components {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  flex-wrap: wrap;
+}
+.signal-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-family: var(--font-family-mono);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-3);
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text-secondary);
+}
+.signal-chip--positive { color: #ef4444; border-color: rgba(239,68,68,0.2); }
+.signal-chip--negative { color: #10b981; border-color: rgba(16,185,129,0.2); }
+
+/* ── Sources & RAG Indicator ── */
+.sources-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sources-summary {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding: var(--space-3);
+  background: var(--color-surface-2);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-subtle);
+}
+.source-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.source-stat__value {
+  font-size: 20px;
+  font-weight: 800;
+  font-family: var(--font-family-mono);
+  color: var(--color-accent-primary);
+}
+.source-stat__label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-tertiary);
+}
+
+.facts-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.fact-item {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-2);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--color-accent-primary);
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
+}
+.fact-item__score {
+  flex-shrink: 0;
+  font-family: var(--font-family-mono);
+  font-weight: 700;
+  color: var(--color-accent-primary);
+  font-size: 11px;
+}
+.fact-item__text {
+  color: var(--color-text-secondary);
+  flex: 1;
+}
+.fact-item__source {
+  font-size: 9px;
+  color: var(--color-text-tertiary);
+  font-style: italic;
+}
+
+/* ── Vessel Signals ── */
+.vessel-signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+.vessel-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-subtle);
+  font-size: var(--font-size-xs);
+}
+.vessel-chip__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.vessel-chip__dot--normal { background: #10b981; }
+.vessel-chip__dot--elevated { background: #f59e0b; }
+.vessel-chip__dot--high { background: #f97316; }
+.vessel-chip__dot--severe { background: #ef4444; }
+.vessel-chip__dot--overflow { background: #8b5cf6; }

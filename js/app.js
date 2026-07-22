@@ -65,6 +65,9 @@ class MirsadApp {
     // Run full pipeline with default scenario
     this.runPipeline();
 
+    // Fetch backend system status (LLM pool badge)
+    this.fetchSystemStatus();
+
     // Update time
     this.updateClock();
     setInterval(() => this.updateClock(), 1000);
@@ -155,20 +158,40 @@ class MirsadApp {
     const btn = document.getElementById('btn-live-scan');
     if (btn) {
       btn.disabled = true;
-      btn.innerHTML = '⏳ Scanning...';
+      btn.innerHTML = '⏳ Scanning 9-node pipeline...';
     }
 
     try {
       const data = await this.coordinator.triggerLiveAnalysis('Middle East shipping routes');
       if (data) {
-        alert(`Analysis Complete!\nRisk Score: ${data.risk_score}\nSummary: ${data.risk_summary}`);
-        
-        // Push the new score into the pipeline results so UI updates
+        // Store the full enriched response
+        this.lastLiveData = data;
+
+        // Update existing UI
         if (this.pipelineResults) {
           this.pipelineResults.riskAssessment.overallRisk.overall = data.risk_score;
           this.renderCommandCenter(this.pipelineResults.riskAssessment);
           this.renderKPITicker(this.pipelineResults.riskAssessment);
         }
+
+        // Render new sophistication pass UI components
+        this.renderMetricsDashboard(data.computed_metrics);
+        this.renderTrajectoryForecast(data.trajectory_forecast);
+        this.renderSourcesIndicator(data);
+        this.updateLLMPoolBadge(data.llm_pool);
+
+        // Show a rich summary instead of basic alert
+        const sources = data.sources_consulted || 0;
+        const facts = data.rag_info?.facts_retrieved || 0;
+        const keys = data.llm_pool?.keys_used || 0;
+        alert(
+          `✅ MIRSAD v2.0 Analysis Complete!\n\n` +
+          `Risk Score: ${data.risk_score}/100\n` +
+          `${data.risk_summary?.substring(0, 200)}...\n\n` +
+          `📊 ${sources} sources · ${facts} RAG facts · ${keys} LLM keys used\n` +
+          `📈 7-day forecast: ${data.trajectory_forecast?.forecast_7d?.direction || '—'}\n` +
+          `\nSwitch to Risk Intelligence tab to see full metrics.`
+        );
       }
     } catch (error) {
       alert(`Error during live analysis: ${error.message}`);
@@ -813,6 +836,291 @@ class MirsadApp {
         }
       }
     }, 15000); // New event every 15 seconds
+  }
+
+  // ══════════════════════════════════════════════════
+  // SOPHISTICATION PASS: New Rendering Methods
+  // ══════════════════════════════════════════════════
+
+  // ── Quantitative Metrics Dashboard (SSI, HHI, DoA, PSI) ──
+  renderMetricsDashboard(metrics) {
+    const container = document.getElementById('metrics-dashboard');
+    if (!container || !metrics) return;
+
+    const ssi = metrics.supply_security_index || {};
+    const hhi = metrics.hhi_concentration || {};
+    const doa = metrics.days_of_autonomy || {};
+    const psi = metrics.price_sensitivity_index || {};
+
+    const metricCards = [
+      {
+        name: 'Supply Security Index',
+        value: ssi.value ?? '—',
+        unit: '/100',
+        color: ssi.color || 'blue',
+        level: ssi.level || '—',
+        formula: ssi.formula || '',
+        interpretation: ssi.interpretation || '',
+        components: ssi.components
+      },
+      {
+        name: 'Supplier Concentration (HHI)',
+        value: hhi.value ?? '—',
+        unit: '',
+        color: hhi.color || 'blue',
+        level: hhi.level || '—',
+        formula: hhi.formula || '',
+        interpretation: hhi.interpretation || '',
+        extra: hhi.top_3_share ? `Top 3: ${(hhi.top_3_share * 100).toFixed(1)}%` : ''
+      },
+      {
+        name: 'Days of Autonomy',
+        value: doa.value ?? '—',
+        unit: ' days',
+        color: doa.color || 'blue',
+        level: doa.level || '—',
+        formula: doa.formula || '',
+        interpretation: doa.interpretation || '',
+        breakdown: doa.breakdown
+      },
+      {
+        name: 'Price Sensitivity Index',
+        value: psi.value ?? '—',
+        unit: ' ₹/L per $/bbl',
+        color: psi.color || 'blue',
+        level: psi.level || '—',
+        formula: psi.formula || '',
+        interpretation: psi.interpretation || ''
+      }
+    ];
+
+    container.innerHTML = metricCards.map(m => `
+      <div class="metric-card metric-card--${m.color}">
+        <div class="metric-card__header">
+          <span class="metric-card__name">${m.name}</span>
+          <span class="metric-card__badge metric-card__badge--${m.color}">${m.level}</span>
+        </div>
+        <div class="metric-card__value metric-card__value--${m.color}">${m.value}${m.unit}</div>
+        ${m.extra ? `<div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px;">${m.extra}</div>` : ''}
+        ${m.breakdown ? `<div style="font-size: 10px; color: var(--color-text-tertiary); margin-bottom: 4px;">
+          SPR: ${m.breakdown.spr_days}d · Transit: ${m.breakdown.transit_days}d · Contracted: ${m.breakdown.contracted_days}d
+        </div>` : ''}
+        ${m.components ? `<div style="font-size: 10px; color: var(--color-text-tertiary); margin-bottom: 4px;">
+          SPR: ${m.components.spr_cover}% · Diversity: ${m.components.supplier_diversity}% · Routes: ${m.components.route_diversity}%
+        </div>` : ''}
+        <div class="metric-card__formula">${m.formula}</div>
+        <div class="metric-card__interpretation">${m.interpretation}</div>
+      </div>
+    `).join('');
+  }
+
+  // ── Predictive Risk Trajectory (7/30-day forecast) ──
+  renderTrajectoryForecast(forecast) {
+    const container = document.getElementById('trajectory-forecast');
+    if (!container || !forecast) return;
+
+    const f7 = forecast.forecast_7d || {};
+    const f30 = forecast.forecast_30d || {};
+    const signals = forecast.signal_components || {};
+
+    const dirIcon = (dir) => dir === 'increasing' ? '↗' : dir === 'decreasing' ? '↘' : '→';
+    const dirColor = (dir) => dir === 'increasing' ? '#ef4444' : dir === 'decreasing' ? '#10b981' : '#f59e0b';
+
+    container.innerHTML = `
+      <div class="trajectory-card">
+        <div class="trajectory-card__title">
+          <i data-lucide="clock"></i> Current Risk Score
+        </div>
+        <div class="trajectory-card__score" style="color: ${dirColor(f7.direction)}">${forecast.current_score}/100</div>
+        <div class="signal-components">
+          <span class="signal-chip ${signals.event_momentum > 0 ? 'signal-chip--positive' : 'signal-chip--negative'}">
+            Events: ${signals.event_momentum > 0 ? '+' : ''}${signals.event_momentum}
+          </span>
+          <span class="signal-chip ${signals.vessel_signal > 0 ? 'signal-chip--positive' : 'signal-chip--negative'}">
+            AIS: ${signals.vessel_signal > 0 ? '+' : ''}${signals.vessel_signal}
+          </span>
+          <span class="signal-chip ${signals.commodity_signal > 0 ? 'signal-chip--positive' : 'signal-chip--negative'}">
+            Oil: ${signals.commodity_signal > 0 ? '+' : ''}${signals.commodity_signal}
+          </span>
+        </div>
+      </div>
+
+      <div class="trajectory-card">
+        <div class="trajectory-card__title">
+          <i data-lucide="calendar"></i> 7-Day Forecast
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 12px;">
+          <div class="trajectory-card__score" style="color: ${dirColor(f7.direction)}">${f7.predicted_score ?? '—'}</div>
+          <span class="trajectory-card__direction trajectory-card__direction--${f7.direction || 'stable'}">
+            ${dirIcon(f7.direction)} ${f7.direction || 'stable'} (±${f7.magnitude || 0})
+          </span>
+        </div>
+        <div class="trajectory-card__confidence">
+          Confidence: ${((f7.confidence || 0) * 100).toFixed(0)}%
+          <div class="confidence-bar"><div class="confidence-bar__fill" style="width: ${(f7.confidence || 0) * 100}%"></div></div>
+        </div>
+      </div>
+
+      <div class="trajectory-card">
+        <div class="trajectory-card__title">
+          <i data-lucide="calendar"></i> 30-Day Forecast
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 12px;">
+          <div class="trajectory-card__score" style="color: ${dirColor(f30.direction)}">${f30.predicted_score ?? '—'}</div>
+          <span class="trajectory-card__direction trajectory-card__direction--${f30.direction || 'stable'}">
+            ${dirIcon(f30.direction)} ${f30.direction || 'stable'} (±${f30.magnitude || 0})
+          </span>
+        </div>
+        <div class="trajectory-card__confidence">
+          Confidence: ${((f30.confidence || 0) * 100).toFixed(0)}%
+          <div class="confidence-bar"><div class="confidence-bar__fill" style="width: ${(f30.confidence || 0) * 100}%"></div></div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ── Sources Consulted & RAG Grounding ──
+  renderSourcesIndicator(data) {
+    const container = document.getElementById('sources-indicator');
+    if (!container) return;
+
+    const sources = data.sources_consulted || 0;
+    const rag = data.rag_info || {};
+    const llmPool = data.llm_pool || {};
+    const vessel = data.vessel_signals || [];
+    const commodity = data.commodity_prices || {};
+    const citations = data.citations || [];
+
+    const factsHtml = (rag.top_facts || []).map(f => `
+      <div class="fact-item">
+        <span class="fact-item__score">${(f.relevance * 100).toFixed(0)}%</span>
+        <div>
+          <div class="fact-item__text">${f.text}</div>
+          <div class="fact-item__source">${f.source}</div>
+        </div>
+      </div>
+    `).join('');
+
+    const vesselHtml = vessel.length ? `
+      <div style="margin-top: var(--space-2)">
+        <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-text-secondary); margin-bottom: var(--space-2)">
+          <i data-lucide="anchor" style="width:12px;height:12px"></i> Chokepoint AIS Signals
+        </div>
+        <div class="vessel-signals">
+          ${vessel.slice(0, 5).map(v => `
+            <div class="vessel-chip">
+              <div class="vessel-chip__dot vessel-chip__dot--${v.congestion_level}"></div>
+              <div>
+                <div style="font-weight: 600;">${v.chokepoint_name}</div>
+                <div style="font-size: 10px; color: var(--color-text-tertiary)">
+                  ${v.transit_count_24h}/${v.avg_transit_count_24h} transits · ${v.deviation_pct > 0 ? '+' : ''}${v.deviation_pct}%
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    ` : '';
+
+    const brent = commodity.brent || {};
+    const commodityHtml = brent.current_price ? `
+      <div style="margin-top: var(--space-2); padding: var(--space-2) var(--space-3); background: var(--color-surface-2); border-radius: var(--radius-md); border: 1px solid var(--color-border-subtle); font-size: var(--font-size-xs);">
+        <span style="font-weight: 600;">🛢️ Brent:</span> $${brent.current_price}
+        <span style="color: ${brent.change_7d_pct > 0 ? '#ef4444' : '#10b981'}; margin-left: 8px;">
+          ${brent.change_7d_pct > 0 ? '▲' : '▼'} ${Math.abs(brent.change_7d_pct)}% (7d)
+        </span>
+        <span style="color: var(--color-text-tertiary); margin-left: 8px;">Vol: ${brent.volatility_30d}%</span>
+        <span style="color: var(--color-text-tertiary); margin-left: 8px;">Source: ${commodity.source}</span>
+      </div>
+    ` : '';
+
+    container.innerHTML = `
+      <div class="sources-summary">
+        <div class="source-stat">
+          <span class="source-stat__value">${sources}</span>
+          <span class="source-stat__label">Sources Consulted</span>
+        </div>
+        <div class="source-stat">
+          <span class="source-stat__value">${rag.facts_retrieved || 0}</span>
+          <span class="source-stat__label">Facts Retrieved</span>
+        </div>
+        <div class="source-stat">
+          <span class="source-stat__value">${llmPool.keys_used || 0}</span>
+          <span class="source-stat__label">LLM Keys Used</span>
+        </div>
+        <div class="source-stat">
+          <span class="source-stat__value">${llmPool.total_calls || 0}</span>
+          <span class="source-stat__label">LLM Calls Made</span>
+        </div>
+        <div class="source-stat">
+          <span class="source-stat__value">${data.articles_analyzed || 0}</span>
+          <span class="source-stat__label">Articles Analyzed</span>
+        </div>
+        <div class="source-stat">
+          <span class="source-stat__value" style="font-size: 14px;">${rag.fact_store_backend || '—'}</span>
+          <span class="source-stat__label">Vector Backend</span>
+        </div>
+      </div>
+      ${commodityHtml}
+      ${vesselHtml}
+      ${factsHtml ? `
+        <div>
+          <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-text-secondary); margin-bottom: var(--space-2);">
+            <i data-lucide="book-open" style="width:12px;height:12px"></i> Top Retrieved Facts (RAG)
+          </div>
+          <div class="facts-list">${factsHtml}</div>
+        </div>
+      ` : ''}
+      ${citations.length ? `
+        <div style="font-size: 10px; color: var(--color-text-tertiary); margin-top: var(--space-2);">
+          Citations: ${citations.join(' · ')}
+        </div>
+      ` : ''}
+    `;
+  }
+
+  // ── LLM Pool Health Badge (Top Bar) ──
+  updateLLMPoolBadge(poolData) {
+    const badge = document.getElementById('llm-pool-badge');
+    const text = document.getElementById('llm-pool-text');
+    if (!badge || !text) return;
+
+    if (!poolData) {
+      text.textContent = 'LLM Pool: —';
+      return;
+    }
+
+    const poolStatus = poolData.pool_status || [];
+    const total = poolStatus.length;
+    const healthy = poolStatus.filter(c => c.status === 'healthy').length;
+
+    text.textContent = `LLM Pool: ${healthy}/${total} healthy`;
+
+    badge.classList.remove('llm-pool-badge--degraded', 'llm-pool-badge--down');
+    if (healthy === 0) {
+      badge.classList.add('llm-pool-badge--down');
+    } else if (healthy < total) {
+      badge.classList.add('llm-pool-badge--degraded');
+    }
+
+    // Build tooltip with per-key details
+    const details = poolStatus.map(c =>
+      `${c.provider}/${c.model}: ${c.status} (${c.requests_today}/${c.daily_limit} today)`
+    ).join('\n');
+    badge.title = `LLM Key Rotation Pool\n${details}`;
+  }
+
+  // Fetch system status on init to populate LLM badge
+  async fetchSystemStatus() {
+    try {
+      const response = await fetch('http://localhost:8000/api/system-status');
+      if (response.ok) {
+        const status = await response.json();
+        this.updateLLMPoolBadge(status.llm_pool);
+      }
+    } catch (e) {
+      // Backend not running — leave badge as-is
+    }
   }
 
   // ── Utilities ──

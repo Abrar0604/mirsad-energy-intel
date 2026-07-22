@@ -5,3 +5,7 @@ langgraph
 langchain-google-genai
 python-dotenv
 requests
+chromadb
+sentence-transformers
+yfinance
+openai
