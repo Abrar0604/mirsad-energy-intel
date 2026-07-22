@@ -34,6 +34,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+import threading
+
+@app.on_event("startup")
+def startup_event():
+    logger.info("Initializing FactStore models in background thread...")
+    threading.Thread(target=fact_store.initialize, daemon=True).start()
+
 class AnalyzeRequest(BaseModel):
     topic: str = Field(..., description="The topic to analyze for geopolitical risk")
 

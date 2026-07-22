@@ -464,12 +464,7 @@ def build_graph():
     return app
 
 
-# Initialize the fact store on module load
-try:
-    fact_store.initialize()
-    logger.info("[Graph] Fact store initialized")
-except Exception as e:
-    logger.warning(f"[Graph] Fact store init failed (will retry on first query): {e}")
+# Fact store initialization moved to main.py background task to prevent port-binding timeouts
 
 # Singleton graph instance
 graph_app = build_graph()
