@@ -12,7 +12,7 @@ MIRSAD (Watchtower) is a real-time geopolitical risk monitoring and disruption s
 - **📉 Scenario Modeller**: Pre-configured disruption war-games. Simulate supply gaps and economic impacts of events like a Hormuz Blockade or a Red Sea crisis.
 - **🚢 Procurement Orchestrator**: Alternative source ranking and rerouting strategy engine to mitigate supply shocks.
 - **🛢️ Reserve Optimizer**: Strategic Petroleum Reserve (SPR) drawdown strategy and coverage optimization (managing reserves in Visakhapatnam, Mangalore, and Padur).
-- **✨ Modern UI/UX**: A fully responsive, soft pastel, human-designed data dashboard powered by CSS Grid, Lucide icons, and fluid micro-animations.
+
 
 ---
 
