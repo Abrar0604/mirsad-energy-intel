@@ -444,13 +444,14 @@ header {
 }
 
 .scenario-view__results {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-3);
   overflow-y: auto;
+  overflow-x: hidden;
   min-height: 0;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ── Procurement Layout ── */
