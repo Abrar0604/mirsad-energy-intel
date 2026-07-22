@@ -189,6 +189,8 @@
     <!-- ════ View 2: Risk Intelligence ════ -->
     <div class="view-panel" id="risk-intel">
       <div class="risk-intel">
+        
+        <!-- HEADER & TOP STATS -->
         <div class="risk-intel__header">
           <div class="section-header">
             <div class="section-header__title">
@@ -199,81 +201,86 @@
           <div id="risk-stats"></div>
         </div>
 
-        <!-- Risk Trend -->
-        <div class="card">
-          <div class="card__header">
-            <span class="card__title"><i data-lucide="trending-up"></i> Risk Score Trend (18-month)</span>
-          </div>
-          <div class="card__body" style="min-height: 180px; flex: 1;">
-            <div class="chart-container">
-              <canvas id="chart-risk-trend"></canvas>
+        <!-- NEW CORE METRICS (V2.0) -->
+        <div class="risk-intel__section risk-intel__section--full">
+          <div class="card">
+            <div class="card__header">
+              <span class="card__title"><i data-lucide="gauge"></i> Quantitative Supply Security Metrics</span>
+              <span class="badge badge--accent" style="font-size: 9px;">LIVE FORMULAS</span>
             </div>
-          </div>
-        </div>
-
-        <!-- Import Sources -->
-        <div class="card">
-          <div class="card__header">
-            <span class="card__title"><i data-lucide="database"></i> Import Source Distribution</span>
-          </div>
-          <div class="card__body" style="min-height: 180px; flex: 1;">
-            <div class="chart-container">
-              <canvas id="chart-import-sources"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <!-- Corridor Radar -->
-        <div class="card" style="grid-column: 1 / -1">
-          <div class="card__header">
-            <span class="card__title"><i data-lucide="target"></i> Corridor Risk Radar</span>
-          </div>
-          <div class="card__body" style="height: 320px">
-            <div class="chart-container">
-              <canvas id="chart-corridor-radar"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <!-- ═══ NEW: Composite Metrics Dashboard ═══ -->
-        <div class="card" style="grid-column: 1 / -1">
-          <div class="card__header">
-            <span class="card__title"><i data-lucide="gauge"></i> Quantitative Supply Security Metrics</span>
-            <span class="badge badge--accent" style="font-size: 9px;">LIVE FORMULAS</span>
-          </div>
-          <div class="card__body">
-            <div id="metrics-dashboard" class="metrics-grid">
-              <div class="metric-card metric-card--loading">
-                <span class="metric-card__label">Run analysis to compute metrics...</span>
+            <div class="card__body">
+              <div id="metrics-dashboard" class="metrics-grid">
+                <div class="metric-card metric-card--loading">
+                  <span class="metric-card__label">Run analysis to compute metrics...</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- ═══ NEW: Risk Trajectory Forecast ═══ -->
-        <div class="card" style="grid-column: 1 / -1">
-          <div class="card__header">
-            <span class="card__title"><i data-lucide="trending-up"></i> Predictive Risk Trajectory</span>
-            <span class="badge badge--warning" style="font-size: 9px;">AI FORECAST</span>
-          </div>
-          <div class="card__body">
-            <div id="trajectory-forecast" class="trajectory-container">
-              <div class="metric-card metric-card--loading">
-                <span class="metric-card__label">Run analysis to generate forecast...</span>
+        <div class="risk-intel__section risk-intel__section--full">
+          <div class="card">
+            <div class="card__header">
+              <span class="card__title"><i data-lucide="trending-up"></i> Predictive Risk Trajectory</span>
+              <span class="badge badge--warning" style="font-size: 9px;">AI FORECAST</span>
+            </div>
+            <div class="card__body">
+              <div id="trajectory-forecast" class="trajectory-container">
+                <div class="metric-card metric-card--loading">
+                  <span class="metric-card__label">Run analysis to generate forecast...</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- ═══ NEW: Sources Consulted & Facts Retrieved ═══ -->
-        <div class="card" style="grid-column: 1 / -1">
-          <div class="card__header">
-            <span class="card__title"><i data-lucide="book-open"></i> Intelligence Sources & RAG Grounding</span>
+        <!-- CHARTS ROW 1 -->
+        <div class="risk-intel__section risk-intel__section--split">
+          <div class="card">
+            <div class="card__header">
+              <span class="card__title"><i data-lucide="target"></i> Corridor Risk Radar</span>
+            </div>
+            <div class="card__body" style="height: 300px; display: flex; align-items: center; justify-content: center;">
+              <div class="chart-container" style="width: 100%; height: 100%;">
+                <canvas id="chart-corridor-radar"></canvas>
+              </div>
+            </div>
           </div>
-          <div class="card__body">
-            <div id="sources-indicator" class="sources-container">
-              <div class="metric-card metric-card--loading">
-                <span class="metric-card__label">No analysis data yet...</span>
+
+          <div class="card">
+            <div class="card__header">
+              <span class="card__title"><i data-lucide="activity"></i> Risk Score Trend (18-month)</span>
+            </div>
+            <div class="card__body" style="height: 300px; display: flex; align-items: center; justify-content: center;">
+              <div class="chart-container" style="width: 100%; height: 100%;">
+                <canvas id="chart-risk-trend"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROW 2 -->
+        <div class="risk-intel__section risk-intel__section--split">
+          <div class="card">
+            <div class="card__header">
+              <span class="card__title"><i data-lucide="book-open"></i> Intelligence Sources & RAG Grounding</span>
+            </div>
+            <div class="card__body" style="height: 100%; display: flex; flex-direction: column;">
+              <div id="sources-indicator" class="sources-container" style="flex: 1;">
+                <div class="metric-card metric-card--loading">
+                  <span class="metric-card__label">No analysis data yet...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card__header">
+              <span class="card__title"><i data-lucide="database"></i> Import Source Distribution</span>
+            </div>
+            <div class="card__body" style="height: 350px; display: flex; align-items: center; justify-content: center;">
+              <div class="chart-container" style="width: 100%; height: 100%;">
+                <canvas id="chart-import-sources"></canvas>
               </div>
             </div>
           </div>
