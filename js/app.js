@@ -1223,7 +1223,7 @@ class MirsadApp {
         this.updateLLMPoolBadge(status.llm_pool);
       }
     } catch (e) {
-      this.showToast('System Error', 'Error fetching system status. Check console.', 'error');
+      console.warn('[SystemStatus] Error fetching system status. Backend might be sleeping.', e);
     }
   }
 
