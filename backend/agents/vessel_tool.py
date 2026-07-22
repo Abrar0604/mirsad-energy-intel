@@ -1,11 +1,14 @@
 """
 MIRSAD — Vessel / AIS Chokepoint Congestion Signals
 ====================================================
-Structured realistic mock simulating AIS-derived chokepoint transit data.
-Designed to match real MarineTraffic/VesselFinder API schema patterns.
+Simulated chokepoint transit data based on public baseline statistics.
+No free public AIS API is available (MarineTraffic free tier: ~10 req/month).
 
-This provides independent quantitative signals — a chokepoint with 40% fewer
-transits than baseline is a hard signal regardless of news sentiment.
+Baseline values are calibrated from EIA and public port authority reports.
+Live deviations are simulated to demonstrate the analytics pipeline.
+
+Source: Baselines from EIA / public AIS statistics.
+        Live signals: SIMULATED (no free API).
 
 Usage:
     from agents.vessel_tool import fetch_vessel_signals
@@ -151,8 +154,8 @@ def _generate_signal(choke_id: str, baseline: Dict[str, Any], timestamp: str) ->
         "risk_contribution": risk_contribution,
 
         # Data source attribution
-        "source": "MIRSAD AIS Intelligence (simulated)",
-        "data_type": "mock_ais"
+        "source": "Simulated (no free AIS API available)",
+        "data_type": "simulated"
     }
 
 

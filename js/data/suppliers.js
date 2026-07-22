@@ -1,6 +1,10 @@
 // ============================================================
 // MIRSAD — Crude Oil Suppliers Data
 // Major crude oil exporting nations supplying India
+// SOURCE: India Petroleum Planning & Analysis Cell (PPAC),
+//         Ministry of Petroleum & Natural Gas (MoPNG) annual statistics 2024-25.
+//         Import shares based on PPAC monthly crude import data.
+//         avg_brent_price_usd is a FALLBACK — live price fetched via yfinance.
 // ============================================================
 
 const SUPPLIERS = [

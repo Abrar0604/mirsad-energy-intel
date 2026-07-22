@@ -20,10 +20,14 @@ class MirsadApp {
     this.mapEngine = null;
     this.charts = new ChartManager();
     this.animations = new AnimationManager();
-    this.currentView = 'command-center';
+    this.currentView = localStorage.getItem('mirsad_current_view') || 'command-center';
     this.pipelineResults = null;
     this.selectedScenario = 'scenario-hormuz-partial';
     this.selectedStrategy = 'strategy-staged';
+    // Live commodity price from pipeline (yfinance)
+    this.liveBrentPrice = null;   // null = not yet fetched
+    this.liveBrentChange = null;  // 1-day % change
+    this.commoditySource = null;  // 'yfinance' | 'yfinance_cached' | 'unavailable'
   }
 
   async initialize() {
@@ -59,8 +63,11 @@ class MirsadApp {
     this.mapEngine = new MapEngine('map-container');
     this.mapEngine.initialize();
 
-    // Render initial view
+    // Render command center components (always needed)
     this.renderCommandCenter(initResult.riskAssessment);
+    
+    // Switch to the last active view
+    this.switchView(this.currentView);
 
     // Run full pipeline with default scenario
     this.runPipeline();
@@ -146,6 +153,12 @@ class MirsadApp {
     if (panel) {
       panel.classList.add('active');
       this.currentView = viewId;
+      localStorage.setItem('mirsad_current_view', viewId);
+      
+      // Update nav tab active states
+      document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.view === viewId);
+      });
 
       // Trigger view-specific rendering
       setTimeout(() => {
@@ -193,17 +206,18 @@ class MirsadApp {
         // Render all UI panels with fresh data
         this.renderAnalysisData(data);
 
-        // Show a rich summary instead of basic alert
+        // Show a rich summary via modern toast notification
         const sources = data.sources_consulted || 0;
         const facts = data.rag_info?.facts_retrieved || 0;
         const keys = data.llm_pool?.keys_used || 0;
-        alert(
-          `✅ MIRSAD v2.0 Analysis Complete!\n\n` +
+        
+        this.showToast(
+          'Analysis Complete',
           `Risk Score: ${data.risk_score}/100\n` +
-          `${data.risk_summary?.substring(0, 200)}...\n\n` +
-          `📊 ${sources} sources · ${facts} RAG facts · ${keys} LLM keys used\n` +
-          `📈 7-day forecast: ${data.trajectory_forecast?.forecast_7d?.direction || '—'}\n` +
-          `\nSwitch to Risk Intelligence tab to see full metrics.`
+          `${data.risk_summary?.substring(0, 120)}...\n\n` +
+          `📊 ${sources} sources · ${facts} RAG facts · ${keys} LLM keys\n` +
+          `📈 7-day forecast: ${data.trajectory_forecast?.forecast_7d?.direction || '—'}`,
+          'success'
         );
       }
     } catch (error) {
@@ -213,13 +227,13 @@ class MirsadApp {
         this.lastLiveData = cached;
         this.renderAnalysisData(cached);
         const cacheTime = cached._cached_at ? new Date(cached._cached_at).toLocaleTimeString() : 'unknown';
-        alert(
-          `⚠️ Live analysis failed: ${error.message}\n\n` +
-          `Displaying previously cached data from ${cacheTime}.\n` +
-          `Risk Score: ${cached.risk_score}/100`
+        this.showToast(
+          'Live analysis failed',
+          `Displaying previously cached data from ${cacheTime}.\nError: ${error.message}`,
+          'warning'
         );
       } else {
-        alert(`Error during live analysis: ${error.message}\n\nNo cached data available.`);
+        this.showToast('Analysis Error', `Live analysis failed: ${error.message}\nNo cached data available.`, 'error');
       }
     } finally {
       if (btn) {
@@ -232,6 +246,16 @@ class MirsadApp {
 
   // ── Render all analysis panels from API data ──
   renderAnalysisData(data) {
+    // Extract and store live Brent price from pipeline response
+    const commodityData = data.commodity_prices || {};
+    const brentData = commodityData.brent || {};
+    if (brentData.current_price != null) {
+      this.liveBrentPrice = brentData.current_price;
+      this.liveBrentChange = brentData.change_1d_pct;
+      this.commoditySource = commodityData.source || 'unknown';
+      console.log(`[MIRSAD] Live Brent: $${this.liveBrentPrice} (source: ${this.commoditySource})`);
+    }
+
     // Update command center risk score
     if (this.pipelineResults) {
       this.pipelineResults.riskAssessment.overallRisk.overall = data.risk_score;
@@ -279,7 +303,10 @@ class MirsadApp {
     const ticker = document.getElementById('kpi-ticker');
     if (!ticker) return;
 
-    const brentPrice = 82.50;
+    // Use live Brent price from pipeline; show 'N/A' if not yet fetched
+    const brentPrice = this.liveBrentPrice;
+    const brentChange = this.liveBrentChange;
+    const brentSource = this.commoditySource;
     const riskScore = assessment.overallRisk.overall;
     const hormuzThreat = assessment.overallRisk.hormuzThreat;
     const sprDays = SPR_STATS.days_of_national_consumption;
@@ -287,11 +314,18 @@ class MirsadApp {
       a.severity === 'critical' || a.severity === 'high'
     ).length;
 
+    // Format Brent display
+    const brentDisplay = brentPrice != null ? `$${brentPrice.toFixed(2)}` : '—';
+    const changeDir = brentChange > 0 ? 'up' : brentChange < 0 ? 'down' : 'flat';
+    const changeArrow = brentChange > 0 ? '▲' : brentChange < 0 ? '▼' : '—';
+    const changeText = brentChange != null ? `${changeArrow} ${Math.abs(brentChange).toFixed(1)}%` : '';
+    const sourceTag = brentSource === 'yfinance' ? '' : brentSource === 'yfinance_cached' ? ' (cached)' : brentSource === 'unavailable' ? ' (N/A)' : '';
+
     ticker.innerHTML = `
       <div class="kpi-item">
-        <span class="kpi-item__label">Brent Crude</span>
-        <span class="kpi-item__value" id="kpi-brent">$${brentPrice.toFixed(2)}</span>
-        <span class="kpi-item__change kpi-item__change--up">▲ 3.2%</span>
+        <span class="kpi-item__label">Brent Crude${sourceTag}</span>
+        <span class="kpi-item__value" id="kpi-brent">${brentDisplay}</span>
+        <span class="kpi-item__change kpi-item__change--${changeDir}">${changeText}</span>
       </div>
       <div class="kpi-divider"></div>
       <div class="kpi-item">
@@ -1189,11 +1223,68 @@ class MirsadApp {
         this.updateLLMPoolBadge(status.llm_pool);
       }
     } catch (e) {
-      // Backend not running — leave badge as-is
+      this.showToast('System Error', 'Error fetching system status. Check console.', 'error');
     }
   }
 
-  // ── Utilities ──
+  // ── Toast Notification System ──
+  showToast(title, message, type = 'info') {
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.className = 'toast-container';
+      document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast--${type}`;
+    
+    let icon = '<i data-lucide="info"></i>';
+    if (type === 'success') icon = '<i data-lucide="check-circle-2" style="color: var(--color-success)"></i>';
+    if (type === 'error') icon = '<i data-lucide="alert-circle" style="color: var(--color-risk-critical)"></i>';
+    if (type === 'warning') icon = '<i data-lucide="alert-triangle" style="color: var(--color-risk-elevated)"></i>';
+
+    toast.innerHTML = `
+      <div class="toast__header">
+        <div class="toast__title">${icon} ${title}</div>
+        <button class="toast__close" aria-label="Close"><i data-lucide="x" style="width: 16px; height: 16px;"></i></button>
+      </div>
+      <div class="toast__body">${message}</div>
+    `;
+
+    container.appendChild(toast);
+    
+    // Initialize lucide icons for the new toast
+    if (window.lucide) {
+      window.lucide.createIcons({ root: toast });
+    }
+
+    // Trigger animation
+    setTimeout(() => {
+      toast.classList.add('toast--visible');
+    }, 10);
+
+    // Auto-remove after 6 seconds
+    const hideTimeout = setTimeout(() => {
+      this.hideToast(toast);
+    }, 6000);
+
+    toast.querySelector('.toast__close').addEventListener('click', () => {
+      clearTimeout(hideTimeout);
+      this.hideToast(toast);
+    });
+  }
+
+  hideToast(toast) {
+    toast.classList.remove('toast--visible');
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 500); // Wait for transition
+  }
+
+  // ── Navigation & Views ──
   updateClock() {
     const el = document.getElementById('system-clock');
     if (el) {

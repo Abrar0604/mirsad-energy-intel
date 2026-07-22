@@ -1,7 +1,8 @@
 // ============================================================
 // MIRSAD — Geopolitical Events Data
-// Real-world-inspired event feed for risk intelligence
-// ============================================================
+// Illustrative scenario catalog based on real-world geopolitical patterns.
+// These are NOT live events — live news is fetched via NewsAPI in the backend.
+// SOURCE: Event patterns modeled from historical EIA, UKMTO, and CENTCOM reports.
 
 const GEOPOLITICAL_EVENTS = [
   // ── 2025 Events ──

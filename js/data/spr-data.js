@@ -1,6 +1,9 @@
 // ============================================================
 // MIRSAD — Strategic Petroleum Reserve Data
 // India's SPR sites, fill levels, and drawdown parameters
+// SOURCE: Indian Strategic Petroleum Reserves Ltd (ISPRL) public disclosures.
+//         Capacity and fill data from PPAC annual reports 2024-25.
+//         Benchmark data from EIA and IEA published statistics.
 // ============================================================
 
 const SPR_SITES = [

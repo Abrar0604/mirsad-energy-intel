@@ -5,6 +5,7 @@
 
 import { SPR_SITES, SPR_STATS, DRAWDOWN_STRATEGIES } from '../data/spr-data.js';
 import { REFINERIES } from '../data/refineries.js';
+import { IMPORT_STATS } from '../data/suppliers.js';
 
 class ReserveOptimizer {
   constructor() {
@@ -215,7 +216,7 @@ class ReserveOptimizer {
           site.current_fill_mmt - schedule.total_release_mmt)) * 100) / 100,
         estimated_cost_usd_mn: Math.round(
           (site.capacity_mmt * 0.9 - Math.max(0, site.current_fill_mmt - schedule.total_release_mmt)) *
-          1e6 * 7.33 * (scenarioResults.economicImpact?.brent_projected_usd || 82.50) / 1e6
+          1e6 * 7.33 * (scenarioResults.economicImpact?.brent_projected_usd || window.app?.liveBrentPrice || IMPORT_STATS.avg_brent_price_usd) / 1e6
         ),
         port_access: site.port_access,
         priority: schedule.status === 'critical' ? 'urgent' : 'normal'
@@ -260,7 +261,7 @@ class ReserveOptimizer {
   analyzeCost(siteSchedules, scenarioResults) {
     const totalReleased = siteSchedules.reduce((sum, s) => sum + s.total_release_mmt, 0);
     const releasedBarrels = totalReleased * 1e6 * 7.33;
-    const brentPrice = scenarioResults?.economicImpact?.brent_projected_usd || 82.50;
+    const brentPrice = scenarioResults?.economicImpact?.brent_projected_usd || window.app?.liveBrentPrice || IMPORT_STATS.avg_brent_price_usd;
     
     // SPR crude was purchased at lower prices
     const avgAcquisitionCost = 65.0; // USD/bbl average

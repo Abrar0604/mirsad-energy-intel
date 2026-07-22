@@ -1,6 +1,9 @@
 // ============================================================
 // MIRSAD — Indian Refineries Data
 // India's major refineries with capacity, location, and specs
+// SOURCE: PPAC / Ministry of Petroleum & Natural Gas, India.
+//         Refinery capacities per PPAC "Refinery-wise Crude Processing" report 2024-25.
+//         Coordinates verified from public geographic data.
 // ============================================================
 
 const REFINERIES = [

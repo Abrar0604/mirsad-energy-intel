@@ -1,6 +1,9 @@
 // ============================================================
-// MIRSAD — Supply Routes Data
-// Major crude supply corridors to India with route coordinates
+// MIRSAD — Supply Routes & Chokepoints
+// Geographic routing data for maritime crude oil transport
+// SOURCE: Route coordinates and distances from maritime navigation data/atlases.
+//         Chokepoint operational definitions from EIA public reports.
+//         SIMULATED_VESSELS is purely illustrative (no free live AIS API available).
 // ============================================================
 
 const SUPPLY_ROUTES = [
@@ -283,7 +286,8 @@ const CHOKEPOINTS = [
   }
 ];
 
-// Simulated vessel positions (AIS-inspired)
+// Simulated vessel positions for map visualization
+// Note: No free public AIS API is available. These are mock positions for demo purposes.
 const SIMULATED_VESSELS = [
   { id: 'v001', name: 'KAMDHENU SPIRIT', type: 'VLCC', flag: 'IN', dwt: 320000, route: 'hormuz-jamnagar', position: [60.5, 23.2], heading: 120, speed: 14.5, cargo: 'Basrah Medium', destination: 'Jamnagar' },
   { id: 'v002', name: 'DESH GARIMA', type: 'VLCC', flag: 'IN', dwt: 318000, route: 'hormuz-jamnagar', position: [65.0, 21.5], heading: 135, speed: 13.8, cargo: 'Arab Heavy', destination: 'Jamnagar' },

@@ -254,7 +254,7 @@ class RiskIntelligenceAgent {
   }
 
   generateAlert(event) {
-    const alert = {
+    const newAlert = {
       id: `alert-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
       timestamp: event.timestamp || new Date().toISOString(),
       severity: event.severity,
@@ -268,13 +268,18 @@ class RiskIntelligenceAgent {
       acknowledged: false
     };
     
-    this.activeAlerts.unshift(alert);
-    // Keep last 50 alerts
+    this.activeAlerts.unshift(newAlert);
     if (this.activeAlerts.length > 50) {
       this.activeAlerts = this.activeAlerts.slice(0, 50);
     }
     
-    return alert;
+    if (window.app && window.app.showToast) {
+      const severityTitles = { 'critical': 'CRITICAL THREAT', 'high': 'HIGH RISK EVENT', 'medium': 'ELEVATED RISK', 'low': 'MONITORING' };
+      const typeMap = { 'critical': 'error', 'high': 'error', 'medium': 'warning', 'low': 'info' };
+      window.app.showToast(severityTitles[event.severity] || 'NEW INTELLIGENCE', `${event.title}\nImpacts: ${event.affectedCorridors ? event.affectedCorridors.join(', ') : 'Global'}`, typeMap[event.severity] || 'info');
+    }
+    
+    return newAlert;
   }
 
   // Get risk color for a score

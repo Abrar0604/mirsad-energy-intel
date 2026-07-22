@@ -56,7 +56,7 @@ def compute_all_metrics(
     if hormuz_import_fraction is None:
         hormuz_import_fraction = INDIA_HORMUZ_EXPOSURE
     if brent_price is None:
-        brent_price = 82.50
+        brent_price = None  # Will be flagged as "unavailable" in output
     if hedge_ratio is None:
         hedge_ratio = NATIONAL_HEDGE_RATIO
 

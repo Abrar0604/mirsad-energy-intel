@@ -3,7 +3,7 @@
 // Alternative source identification and ranking
 // ============================================================
 
-import { SUPPLIERS } from '../data/suppliers.js';
+import { SUPPLIERS, IMPORT_STATS } from '../data/suppliers.js';
 import { SUPPLY_ROUTES } from '../data/supply-routes.js';
 import { REFINERIES } from '../data/refineries.js';
 
@@ -213,14 +213,16 @@ class ProcurementOrchestrator {
   }
 
   calculateDeliveredCost(supplier, route, scenarioResults) {
-    const brentBase = scenarioResults?.economicImpact?.brent_projected_usd || 82.50;
+    const liveBrent = window.app?.liveBrentPrice || IMPORT_STATS.avg_brent_price_usd;
+    const brentBase = scenarioResults?.economicImpact?.brent_projected_usd || liveBrent;
     const premium = this.estimateSpotPremium(supplier, scenarioResults);
     const freight = this.estimateFreightCost(route);
     return Math.round((brentBase + premium + freight) * 10) / 10;
   }
 
   calculateCostDelta(supplier, route, scenarioResults) {
-    const termCost = 82.50 + supplier.typical_premium + 2.0; // baseline term contract
+    const liveBrent = window.app?.liveBrentPrice || IMPORT_STATS.avg_brent_price_usd;
+    const termCost = liveBrent + supplier.typical_premium + 2.0; // baseline term contract
     const spotCost = this.calculateDeliveredCost(supplier, route, scenarioResults);
     return Math.round(((spotCost - termCost) / termCost) * 100 * 10) / 10;
   }

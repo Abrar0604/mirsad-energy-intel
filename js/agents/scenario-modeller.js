@@ -6,6 +6,7 @@
 import { SCENARIOS } from '../data/scenarios.js';
 import { REFINERIES } from '../data/refineries.js';
 import { SUPPLY_ROUTES } from '../data/supply-routes.js';
+import { SUPPLIERS, IMPORT_STATS } from '../data/suppliers.js';
 import { SPR_STATS } from '../data/spr-data.js';
 
 class ScenarioModeller {
@@ -38,7 +39,7 @@ class ScenarioModeller {
     const config = {
       duration: params.duration || scenario.duration_days,
       flowReduction: params.flowReduction || scenario.flow_reduction_pct,
-      brentBase: params.brentBase || 82.50,
+      brentBase: params.brentBase || (window.app?.liveBrentPrice) || IMPORT_STATS.avg_brent_price_usd,
       ...params
     };
 
@@ -284,7 +285,7 @@ class ScenarioModeller {
 
   generatePriceTrajectory(scenario, config) {
     const trajectory = [];
-    const basePrice = 82.50;
+    const basePrice = config.brentBase || (window.app?.liveBrentPrice) || IMPORT_STATS.avg_brent_price_usd;
     const peakPrice = basePrice * (1 + scenario.brent_price_impact_pct / 100);
     
     for (let day = 0; day <= config.duration; day += Math.max(1, Math.floor(config.duration / 30))) {

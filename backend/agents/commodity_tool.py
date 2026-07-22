@@ -1,43 +1,76 @@
 """
 MIRSAD — Commodity Price Feed
 ==============================
-Live Brent/WTI price data via yfinance with realistic mock fallback.
-Provides current prices, changes, volatility, and historical time series.
+Live Brent/WTI price data via yfinance with file-based cache fallback.
+NO mock/random data — either real prices or cached last-good response.
+
+Source: Yahoo Finance (yfinance library, tickers BZ=F and CL=F)
+Cache: backend/cache/commodity_prices.json (1-hour TTL)
 
 Usage:
     from agents.commodity_tool import fetch_commodity_prices
     data = fetch_commodity_prices()
 """
 
+import json
 import logging
-import random
-import math
+import os
 from datetime import datetime, timedelta
-from typing import Dict, Any, List
+from pathlib import Path
+from typing import Dict, Any
 
 logger = logging.getLogger("mirsad.commodity")
+
+CACHE_DIR = Path(__file__).parent.parent / "cache"
+CACHE_FILE = CACHE_DIR / "commodity_prices.json"
+CACHE_TTL_SECONDS = 3600  # 1 hour
 
 
 def fetch_commodity_prices() -> Dict[str, Any]:
     """
     Fetch current Brent and WTI crude oil prices.
     
-    Tries yfinance first; falls back to realistic mock if unavailable.
+    Strategy:
+      1. Try yfinance live fetch
+      2. On success, cache the result to disk
+      3. On failure, serve cached last-good response (if fresh enough)
+      4. If no cache exists, return explicit "unavailable" response
     
     Returns:
         {
-            "brent": { "current_price", "change_1d_pct", "change_7d_pct", "change_30d_pct", "volatility_30d", "price_history": [...] },
+            "brent": { "current_price", "change_1d_pct", ... },
             "wti": { ... },
             "brent_wti_spread": float,
-            "source": "yfinance" | "mock",
+            "source": "yfinance" | "yfinance_cached" | "unavailable",
             "timestamp": str
         }
     """
+    # Try live fetch first
     try:
-        return _fetch_live()
+        data = _fetch_live()
+        _write_cache(data)
+        return data
     except Exception as e:
-        logger.warning(f"[Commodity] yfinance failed: {e}. Using realistic mock data.")
-        return _generate_mock()
+        logger.warning(f"[Commodity] yfinance failed: {e}. Trying cache...")
+
+    # Fallback to cached data
+    cached = _read_cache()
+    if cached:
+        cached["source"] = "yfinance_cached"
+        logger.info(f"[Commodity] Serving cached prices from {cached.get('timestamp', '?')}")
+        return cached
+
+    # No cache available — return unavailable (NOT mock data)
+    logger.error("[Commodity] No live data and no cache. Returning unavailable.")
+    return {
+        "brent": {"current_price": None, "change_1d_pct": None, "change_7d_pct": None,
+                  "change_30d_pct": None, "volatility_30d": None, "price_history": []},
+        "wti": {"current_price": None, "change_1d_pct": None, "change_7d_pct": None,
+                "change_30d_pct": None, "volatility_30d": None, "price_history": []},
+        "brent_wti_spread": None,
+        "source": "unavailable",
+        "timestamp": datetime.utcnow().isoformat()
+    }
 
 
 def _fetch_live() -> Dict[str, Any]:
@@ -99,62 +132,32 @@ def _pct_change(series, periods: int) -> float:
     return ((current - past) / past) * 100 if past != 0 else 0.0
 
 
-def _generate_mock() -> Dict[str, Any]:
-    """Generate realistic mock commodity price data calibrated to real ranges."""
-    base_brent = 82.50
-    base_wti = 78.20
+# ── Cache I/O ──
 
-    # Add some daily jitter
-    jitter_brent = random.uniform(-2.0, 2.0)
-    jitter_wti = random.uniform(-1.8, 1.8)
-    current_brent = base_brent + jitter_brent
-    current_wti = base_wti + jitter_wti
-
-    result = {"source": "mock", "timestamp": datetime.utcnow().isoformat()}
-
-    for label, base, current in [("brent", base_brent, current_brent), ("wti", base_wti, current_wti)]:
-        # Generate 60-day synthetic history with realistic brownian motion
-        history = _generate_price_history(base, 60)
-        history[-1]["close"] = round(current, 2)  # pin last day to current
-
-        past_1d = history[-2]["close"] if len(history) >= 2 else current
-        past_7d = history[-6]["close"] if len(history) >= 6 else current
-        past_30d = history[-23]["close"] if len(history) >= 23 else current
-
-        # Realized volatility from history
-        closes = [h["close"] for h in history[-23:]]
-        if len(closes) >= 2:
-            returns = [(closes[i] - closes[i-1]) / closes[i-1] for i in range(1, len(closes))]
-            vol = (sum(r**2 for r in returns) / len(returns)) ** 0.5 * (252 ** 0.5) * 100
-        else:
-            vol = 25.0
-
-        result[label] = {
-            "current_price": round(current, 2),
-            "change_1d_pct": round(((current - past_1d) / past_1d) * 100, 2),
-            "change_7d_pct": round(((current - past_7d) / past_7d) * 100, 2),
-            "change_30d_pct": round(((current - past_30d) / past_30d) * 100, 2),
-            "volatility_30d": round(vol, 2),
-            "price_history": history
-        }
-
-    result["brent_wti_spread"] = round(current_brent - current_wti, 2)
-    return result
+def _write_cache(data: Dict[str, Any]) -> None:
+    """Write commodity data to disk cache."""
+    try:
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        with open(CACHE_FILE, "w") as f:
+            json.dump(data, f)
+        logger.info(f"[Commodity] Cached prices to {CACHE_FILE}")
+    except Exception as e:
+        logger.warning(f"[Commodity] Cache write failed: {e}")
 
 
-def _generate_price_history(base: float, days: int) -> List[Dict[str, str]]:
-    """Generate synthetic daily OHLC-like price history with geometric Brownian motion."""
-    prices = []
-    price = base - random.uniform(3, 8)  # start slightly lower
-    daily_vol = 0.015  # 1.5% daily vol
+def _read_cache() -> Dict[str, Any] | None:
+    """Read cached commodity data if it exists and is within TTL."""
+    try:
+        if not CACHE_FILE.exists():
+            return None
 
-    for i in range(days):
-        date = (datetime.utcnow() - timedelta(days=days - i)).strftime("%Y-%m-%d")
-        # GBM step
-        shock = random.gauss(0.0002, daily_vol)  # slight upward drift
-        price *= math.exp(shock)
-        price = max(price, 50.0)  # floor at $50
-        price = min(price, 130.0)  # cap at $130
-        prices.append({"date": date, "close": round(price, 2)})
+        # Check file age
+        age_seconds = (datetime.utcnow() - datetime.utcfromtimestamp(CACHE_FILE.stat().st_mtime)).total_seconds()
+        if age_seconds > CACHE_TTL_SECONDS * 6:  # Allow up to 6x TTL for fallback (6 hours)
+            logger.warning(f"[Commodity] Cache is {age_seconds/3600:.1f}h old — stale but usable as fallback.")
 
-    return prices
+        with open(CACHE_FILE, "r") as f:
+            return json.load(f)
+    except Exception as e:
+        logger.warning(f"[Commodity] Cache read failed: {e}")
+        return None
