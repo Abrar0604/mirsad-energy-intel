@@ -203,7 +203,8 @@ class AgentCoordinator {
 
       const data = await response.json();
       
-      if (data.error) {
+      // If we have a risk score, the pipeline completed (potentially with fallbacks)
+      if (data.error && !data.risk_score) {
         throw new Error(data.error);
       }
 

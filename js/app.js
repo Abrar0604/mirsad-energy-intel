@@ -1090,14 +1090,14 @@ class MirsadApp {
       return;
     }
 
-    const poolStatus = poolData.pool_status || [];
+    const poolStatus = poolData.pool_status || poolData.credentials || [];
     const total = poolStatus.length;
     const healthy = poolStatus.filter(c => c.status === 'healthy').length;
 
     text.textContent = `LLM Pool: ${healthy}/${total} healthy`;
 
     badge.classList.remove('llm-pool-badge--degraded', 'llm-pool-badge--down');
-    if (healthy === 0) {
+    if (total > 0 && healthy === 0) {
       badge.classList.add('llm-pool-badge--down');
     } else if (healthy < total) {
       badge.classList.add('llm-pool-badge--degraded');
