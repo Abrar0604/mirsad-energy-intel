@@ -141,7 +141,12 @@ class LLMPool:
             logger.warning("[LLMPool] No LLM credentials configured. Will use mock responses.")
 
     def _default_model(self, provider: str) -> str:
-        defaults = {"gemini": "gemini-2.0-flash", "openai": "gpt-4o-mini"}
+        defaults = {
+            "gemini": "gemini-2.0-flash",
+            "openai": "gpt-4o-mini",
+            "grok": "grok-3-mini",
+            "xai": "grok-3-mini"
+        }
         return defaults.get(provider, "unknown")
 
     def _next_available(self) -> Optional[LLMCredential]:
@@ -162,6 +167,8 @@ class LLMPool:
             return self._call_gemini(cred, prompt, system, max_tokens)
         elif cred.provider == "openai":
             return self._call_openai(cred, prompt, system, max_tokens)
+        elif cred.provider in ("grok", "xai"):
+            return self._call_grok(cred, prompt, system, max_tokens)
         else:
             raise ValueError(f"Unsupported provider: {cred.provider}")
 
@@ -190,6 +197,26 @@ class LLMPool:
         from openai import OpenAI
 
         client = OpenAI(api_key=cred.api_key)
+        messages = []
+        if system:
+            messages.append({"role": "system", "content": system})
+        messages.append({"role": "user", "content": prompt})
+        response = client.chat.completions.create(
+            model=cred.model,
+            messages=messages,
+            max_tokens=max_tokens,
+            temperature=0
+        )
+        return response.choices[0].message.content
+
+    def _call_grok(self, cred: LLMCredential, prompt: str, system: str, max_tokens: int) -> str:
+        """Call xAI Grok API (OpenAI-compatible with custom base URL)."""
+        from openai import OpenAI
+
+        client = OpenAI(
+            api_key=cred.api_key,
+            base_url="https://api.x.ai/v1"
+        )
         messages = []
         if system:
             messages.append({"role": "system", "content": system})
