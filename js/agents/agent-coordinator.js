@@ -190,7 +190,7 @@ class AgentCoordinator {
     this.activeFetchController = new AbortController();
 
     try {
-      const response = await fetch('http://localhost:8000/api/analyze-risk', {
+      const response = await fetch('https://mirsad-energy-intel.onrender.com/api/analyze-risk', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ topic }),

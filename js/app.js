@@ -1217,7 +1217,7 @@ class MirsadApp {
   // Fetch system status on init to populate LLM badge
   async fetchSystemStatus() {
     try {
-      const response = await fetch('http://localhost:8000/api/system-status');
+      const response = await fetch('https://mirsad-energy-intel.onrender.com/api/system-status');
       if (response.ok) {
         const status = await response.json();
         this.updateLLMPoolBadge(status.llm_pool);
