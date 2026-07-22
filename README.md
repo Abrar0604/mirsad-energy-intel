@@ -13,6 +13,10 @@
 [![Leaflet](https://img.shields.io/badge/Leaflet.js-Maps-199900?logo=leaflet&logoColor=white)](https://leafletjs.com)
 [![Chart.js](https://img.shields.io/badge/Chart.js-Viz-FF6384?logo=chartdotjs&logoColor=white)](https://www.chartjs.org)
 
+<br>
+
+> 🚀 **Live Demo:** [mirsad-energy-intel.vercel.app](https://mirsad-energy-intel.vercel.app/)
+
 </div>
 
 ---
