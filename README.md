@@ -260,6 +260,11 @@ python3 -m http.server 8080
 ### 4. Access the Platform
 Open your browser and navigate to: **http://localhost:8080**
 
+### 5. Production Deployment (Hackathon)
+For cloud deployment (e.g., Render for backend, Vercel for frontend):
+- **Backend (Render):** Set the Build Command to `cd backend && pip install -r requirements.txt` and the Start Command to `cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT`. Remember to set all `.env` variables in the Render dashboard.
+- **Frontend (Vercel):** Update `API_URL` in `js/agents/agent-coordinator.js` to your new Render URL, then deploy the root directory to Vercel (no build command needed).
+
 ---
 
 ## 🧪 Usage
