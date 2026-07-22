@@ -67,9 +67,10 @@
           <i data-lucide="cpu"></i>
           <span id="llm-pool-text">LLM Pool: —</span>
         </div>
-        <button id="btn-live-scan" class="btn btn--sm btn--primary" onclick="window.app.runLiveAnalysis()">
-          <i data-lucide="radio"></i> Scan Live Threats
-        </button>
+        <div id="last-scan-badge" class="last-scan-badge" title="Auto-scans run 3x daily">
+          <i data-lucide="clock"></i>
+          <span id="last-scan-text">Last Scan: Loading...</span>
+        </div>
         <div style="display: flex; flex-direction: column; align-items: flex-end;">
           <div class="status-indicator">
             <div class="status-indicator__dot"></div>

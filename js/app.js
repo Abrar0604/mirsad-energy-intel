@@ -75,8 +75,8 @@ class MirsadApp {
     // Fetch backend system status (LLM pool badge)
     this.fetchSystemStatus();
 
-    // Restore last successful analysis from cache
-    this.restoreCachedAnalysis();
+    // Fetch the latest auto-scan result from backend (falls back to cache/static)
+    this.fetchLatestScan();
 
     // Update time
     this.updateClock();
@@ -189,70 +189,82 @@ class MirsadApp {
     this.renderAuditTrail(this.coordinator.getAuditTrail());
   }
 
-  async runLiveAnalysis() {
-    const btn = document.getElementById('btn-live-scan');
-    if (btn) {
-      btn.disabled = true;
-      btn.innerHTML = '⏳ Scanning 9-node pipeline...';
-    }
-
+  async fetchLatestScan() {
     try {
-      const data = await this.coordinator.triggerLiveAnalysis('Middle East shipping routes');
-      if (data) {
-        // Store the full enriched response and persist to cache
-        this.lastLiveData = data;
-        this.cacheAnalysisData(data);
-
-        // Render all UI panels with fresh data
-        this.renderAnalysisData(data);
-
-        // Show a rich summary via modern toast notification
-        const sources = data.sources_consulted || 0;
-        const facts = data.rag_info?.facts_retrieved || 0;
-        const keys = data.llm_pool?.keys_used || 0;
-        
-        this.showToast(
-          'Analysis Complete',
-          `Risk Score: ${data.risk_score}/100\n` +
-          `${data.risk_summary?.substring(0, 120)}...\n\n` +
-          `📊 ${sources} sources · ${facts} RAG facts · ${keys} LLM keys\n` +
-          `📈 7-day forecast: ${data.trajectory_forecast?.forecast_7d?.direction || '—'}`,
-          'success'
-        );
-      }
-    } catch (error) {
-      let cached = this.getCachedAnalysis();
-      
-      if (!cached) {
-        try {
-          const fallbackResp = await fetch('js/data/fallback-analysis.json');
-          if (fallbackResp.ok) {
-            cached = await fallbackResp.json();
-            cached._cached_at = new Date().toISOString(); // Mark as fallback
-          }
-        } catch (fallbackError) {
-          console.error("Fallback load failed:", fallbackError);
+      const response = await fetch('https://mirsad-energy-intel.onrender.com/api/latest-scan');
+      if (response.ok) {
+        const result = await response.json();
+        if (result.data) {
+          this.lastLiveData = result.data;
+          this.cacheAnalysisData(result.data);
+          this.renderAnalysisData(result.data);
+          this.updateLastScanBadge(result.scanned_at, 'success');
+          return;
         }
       }
+    } catch (e) {
+      console.warn('[MIRSAD] Could not fetch latest scan from backend:', e.message);
+    }
 
-      if (cached) {
-        this.lastLiveData = cached;
-        this.renderAnalysisData(cached);
-        const cacheTime = cached._cached_at ? new Date(cached._cached_at).toLocaleTimeString() : 'unknown';
-        this.showToast(
-          'Live analysis unavailable',
-          `Render backend is sleeping. Displaying fallback intelligence data.\nError: ${error.message}`,
-          'warning'
-        );
-      } else {
-        this.showToast('Analysis Error', `Live analysis failed: ${error.message}\nNo fallback data available.`, 'error');
+    // Fallback: try local cache, then static fallback JSON
+    let cached = this.getCachedAnalysis();
+    if (!cached) {
+      try {
+        const fallbackResp = await fetch('js/data/fallback-analysis.json');
+        if (fallbackResp.ok) {
+          cached = await fallbackResp.json();
+          cached._cached_at = cached._scanned_at || new Date().toISOString();
+        }
+      } catch (e) {
+        console.warn('Fallback load failed:', e);
       }
-    } finally {
-      if (btn) {
-        btn.disabled = false;
-        btn.innerHTML = '<i data-lucide="radio"></i> Scan Live Threats';
-      }
-      this.renderAuditTrail(this.coordinator.getAuditTrail());
+    }
+
+    if (cached) {
+      this.lastLiveData = cached;
+      this.renderAnalysisData(cached);
+      this.updateLastScanBadge(cached._scanned_at || cached._cached_at, 'fallback');
+    }
+  }
+
+  updateLastScanBadge(timestamp, status) {
+    const badge = document.getElementById('last-scan-badge');
+    const text = document.getElementById('last-scan-text');
+    if (!badge || !text) return;
+
+    if (!timestamp) {
+      text.textContent = 'Last Scan: N/A';
+      return;
+    }
+
+    const scanDate = new Date(timestamp);
+    const now = new Date();
+    const hoursAgo = Math.round((now - scanDate) / (1000 * 60 * 60));
+
+    // Format: "Jul 23, 04:30 IST"
+    const formatted = scanDate.toLocaleString('en-IN', {
+      month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+      timeZone: 'Asia/Kolkata', hour12: false
+    }) + ' IST';
+
+    let label = `Last Scan: ${formatted}`;
+    if (hoursAgo < 1) {
+      label += ' (< 1h ago)';
+    } else if (hoursAgo < 24) {
+      label += ` (${hoursAgo}h ago)`;
+    } else {
+      label += ` (${Math.round(hoursAgo / 24)}d ago)`;
+    }
+
+    text.textContent = label;
+
+    // Style badge based on freshness
+    badge.classList.remove('last-scan-badge--fresh', 'last-scan-badge--stale');
+    if (hoursAgo <= 9) {
+      badge.classList.add('last-scan-badge--fresh');
+    } else {
+      badge.classList.add('last-scan-badge--stale');
     }
   }
 
