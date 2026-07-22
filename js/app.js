@@ -68,6 +68,9 @@ class MirsadApp {
     // Fetch backend system status (LLM pool badge)
     this.fetchSystemStatus();
 
+    // Restore last successful analysis from cache
+    this.restoreCachedAnalysis();
+
     // Update time
     this.updateClock();
     setInterval(() => this.updateClock(), 1000);
@@ -164,21 +167,12 @@ class MirsadApp {
     try {
       const data = await this.coordinator.triggerLiveAnalysis('Middle East shipping routes');
       if (data) {
-        // Store the full enriched response
+        // Store the full enriched response and persist to cache
         this.lastLiveData = data;
+        this.cacheAnalysisData(data);
 
-        // Update existing UI
-        if (this.pipelineResults) {
-          this.pipelineResults.riskAssessment.overallRisk.overall = data.risk_score;
-          this.renderCommandCenter(this.pipelineResults.riskAssessment);
-          this.renderKPITicker(this.pipelineResults.riskAssessment);
-        }
-
-        // Render new sophistication pass UI components
-        this.renderMetricsDashboard(data.computed_metrics);
-        this.renderTrajectoryForecast(data.trajectory_forecast);
-        this.renderSourcesIndicator(data);
-        this.updateLLMPoolBadge(data.llm_pool);
+        // Render all UI panels with fresh data
+        this.renderAnalysisData(data);
 
         // Show a rich summary instead of basic alert
         const sources = data.sources_consulted || 0;
@@ -194,13 +188,70 @@ class MirsadApp {
         );
       }
     } catch (error) {
-      alert(`Error during live analysis: ${error.message}`);
+      // On API failure, try to use cached data
+      const cached = this.getCachedAnalysis();
+      if (cached) {
+        this.lastLiveData = cached;
+        this.renderAnalysisData(cached);
+        const cacheTime = cached._cached_at ? new Date(cached._cached_at).toLocaleTimeString() : 'unknown';
+        alert(
+          `⚠️ Live analysis failed: ${error.message}\n\n` +
+          `Displaying previously cached data from ${cacheTime}.\n` +
+          `Risk Score: ${cached.risk_score}/100`
+        );
+      } else {
+        alert(`Error during live analysis: ${error.message}\n\nNo cached data available.`);
+      }
     } finally {
       if (btn) {
         btn.disabled = false;
         btn.innerHTML = '<i data-lucide="radio"></i> Scan Live Threats';
       }
       this.renderAuditTrail(this.coordinator.getAuditTrail());
+    }
+  }
+
+  // ── Render all analysis panels from API data ──
+  renderAnalysisData(data) {
+    // Update command center risk score
+    if (this.pipelineResults) {
+      this.pipelineResults.riskAssessment.overallRisk.overall = data.risk_score;
+      this.renderCommandCenter(this.pipelineResults.riskAssessment);
+      this.renderKPITicker(this.pipelineResults.riskAssessment);
+    }
+
+    // Render sophistication pass UI components
+    this.renderMetricsDashboard(data.computed_metrics);
+    this.renderTrajectoryForecast(data.trajectory_forecast);
+    this.renderSourcesIndicator(data);
+    this.updateLLMPoolBadge(data.llm_pool);
+  }
+
+  // ── Cache Management ──
+  cacheAnalysisData(data) {
+    try {
+      const toCache = { ...data, _cached_at: new Date().toISOString() };
+      localStorage.setItem('mirsad_last_analysis', JSON.stringify(toCache));
+    } catch (e) {
+      console.warn('[MIRSAD] Failed to cache analysis data:', e);
+    }
+  }
+
+  getCachedAnalysis() {
+    try {
+      const raw = localStorage.getItem('mirsad_last_analysis');
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  restoreCachedAnalysis() {
+    const cached = this.getCachedAnalysis();
+    if (cached) {
+      console.log(`[MIRSAD] Restoring cached analysis from ${cached._cached_at}`);
+      this.lastLiveData = cached;
+      this.renderAnalysisData(cached);
     }
   }
 
