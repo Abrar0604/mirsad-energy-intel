@@ -335,50 +335,36 @@
             </div>
           </div>
 
-          <!-- Brent Price Trajectory -->
-          <div class="scenario-result-card">
+          <!-- Tabbed Charts -->
+          <div class="scenario-result-card" style="grid-column: 1 / -1">
             <div class="scenario-result-card__header">
-              <span class="scenario-result-card__title"><i data-lucide="trending-up"></i> Brent Price Trajectory</span>
+              <nav class="scenario-chart-tabs" id="scenario-chart-tabs">
+                <button class="scenario-chart-tab active" data-chart="price-trajectory">
+                  <i data-lucide="trending-up"></i> Brent Price
+                </button>
+                <button class="scenario-chart-tab" data-chart="gdp-trajectory">
+                  <i data-lucide="trending-down"></i> GDP
+                </button>
+                <button class="scenario-chart-tab" data-chart="refinery-impact">
+                  <i data-lucide="factory"></i> Refinery Util.
+                </button>
+                <button class="scenario-chart-tab" data-chart="supply-gap">
+                  <i data-lucide="bar-chart-2"></i> Supply Gap
+                </button>
+              </nav>
             </div>
-            <div class="scenario-result-card__body">
-              <div class="chart-container">
-                <canvas id="chart-price-trajectory"></canvas>
+            <div class="scenario-result-card__body" style="min-height: 300px;">
+              <div class="scenario-chart-panel active" id="panel-price-trajectory">
+                <div class="chart-container"><canvas id="chart-price-trajectory"></canvas></div>
               </div>
-            </div>
-          </div>
-
-          <!-- GDP Impact -->
-          <div class="scenario-result-card">
-            <div class="scenario-result-card__header">
-              <span class="scenario-result-card__title"><i data-lucide="trending-down"></i> GDP Trajectory</span>
-            </div>
-            <div class="scenario-result-card__body">
-              <div class="chart-container">
-                <canvas id="chart-gdp-trajectory"></canvas>
+              <div class="scenario-chart-panel" id="panel-gdp-trajectory">
+                <div class="chart-container"><canvas id="chart-gdp-trajectory"></canvas></div>
               </div>
-            </div>
-          </div>
-
-          <!-- Refinery Utilization -->
-          <div class="scenario-result-card">
-            <div class="scenario-result-card__header">
-              <span class="scenario-result-card__title"><i data-lucide="factory"></i> Refinery Utilization Impact</span>
-            </div>
-            <div class="scenario-result-card__body">
-              <div class="chart-container">
-                <canvas id="chart-refinery-impact"></canvas>
+              <div class="scenario-chart-panel" id="panel-refinery-impact">
+                <div class="chart-container"><canvas id="chart-refinery-impact"></canvas></div>
               </div>
-            </div>
-          </div>
-
-          <!-- Supply Gap -->
-          <div class="scenario-result-card">
-            <div class="scenario-result-card__header">
-              <span class="scenario-result-card__title"><i data-lucide="bar-chart-2"></i> Supply Gap Projection (Monthly)</span>
-            </div>
-            <div class="scenario-result-card__body">
-              <div class="chart-container">
-                <canvas id="chart-supply-gap"></canvas>
+              <div class="scenario-chart-panel" id="panel-supply-gap">
+                <div class="chart-container"><canvas id="chart-supply-gap"></canvas></div>
               </div>
             </div>
           </div>

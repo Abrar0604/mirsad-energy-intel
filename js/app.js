@@ -119,6 +119,25 @@ class MirsadApp {
         if (targetPanel) targetPanel.classList.add('active');
       });
     });
+
+    // Scenario chart tabs
+    const chartTabs = document.querySelectorAll('.scenario-chart-tab');
+    chartTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const chartId = tab.dataset.chart;
+
+        // Update active tab
+        chartTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // Show/hide panels
+        document.querySelectorAll('.scenario-chart-panel').forEach(panel => {
+          panel.classList.remove('active');
+        });
+        const targetPanel = document.getElementById(`panel-${chartId}`);
+        if (targetPanel) targetPanel.classList.add('active');
+      });
+    });
   }
 
   switchView(viewId) {
