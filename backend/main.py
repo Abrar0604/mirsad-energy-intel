@@ -89,6 +89,7 @@ def load_cached_scan():
                 data = json.load(f)
             now = data.get("_scanned_at") or data.get("timestamp") or datetime.now(timezone.utc).isoformat()
             data["_scanned_at"] = now
+            data["timestamp"] = now
             latest_scan_data["result"] = data
             latest_scan_data["scanned_at"] = now
             latest_scan_data["status"] = "success"
@@ -198,6 +199,7 @@ def analyze_risk(request: AnalyzeRequest):
         if report:
             now = datetime.now(timezone.utc).isoformat()
             report["_scanned_at"] = now
+            report["timestamp"] = now
             report["_scan_type"] = "manual"
             latest_scan_data["result"] = report
             latest_scan_data["scanned_at"] = now

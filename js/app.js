@@ -89,6 +89,16 @@ class MirsadApp {
     this.updateClock();
     setInterval(() => this.updateClock(), 1000);
 
+    // Auto-poll for new automatic backend scans every 45 seconds
+    setInterval(() => this.fetchLatestScan(true), 45000);
+
+    // Periodically update scan freshness label/tooltip every 30 seconds
+    setInterval(() => {
+      if (this.lastScanTimestamp) {
+        this.updateLastScanBadge(this.lastScanTimestamp, this.lastScanType);
+      }
+    }, 30000);
+
     // Simulated live events are now triggered manually via the 'Scan Live Threats' button
     // this.startLiveEventSimulation();
 
@@ -427,10 +437,20 @@ class MirsadApp {
       const scanResult = await resp.json();
       console.log('[MIRSAD] Live scan completed successfully:', scanResult);
 
+      const scanTime = scanResult._scanned_at || new Date().toISOString();
+      scanResult._scanned_at = scanTime;
+      scanResult.timestamp = scanTime;
+      scanResult._scan_type = 'manual';
+
       this.lastLiveData = scanResult;
       this.cacheAnalysisData(scanResult);
       this.renderAnalysisData(scanResult);
-      this.updateLastScanBadge(scanResult.timestamp || scanResult._scanned_at, 'success');
+      this.updateLastScanBadge(scanTime, 'manual');
+
+      try {
+        localStorage.setItem('mirsad_last_scan_time', scanTime);
+        localStorage.setItem('mirsad_last_scan_type', 'manual');
+      } catch(e) {}
 
       if (text) text.textContent = 'Scan Complete';
       setTimeout(() => {
@@ -451,45 +471,69 @@ class MirsadApp {
     }
   }
 
-  async fetchLatestScan() {
+  async fetchLatestScan(isBackgroundPoll = false) {
     try {
       const response = await fetch('https://mirsad-energy-intel.onrender.com/api/latest-scan');
       if (response.ok) {
         const result = await response.json();
-        if (result.data) {
-          this.lastLiveData = result.data;
-          this.cacheAnalysisData(result.data);
-          this.renderAnalysisData(result.data);
-          this.updateLastScanBadge(result.scanned_at, 'success');
-          return;
+        if (result && (result.scanned_at || result.data)) {
+          const scanTime = result.scanned_at || result.data?._scanned_at || result.data?.timestamp;
+          const scanType = result.data?._scan_type || 'auto';
+
+          if (result.data) {
+            this.lastLiveData = result.data;
+            this.cacheAnalysisData(result.data);
+            if (!isBackgroundPoll) {
+              this.renderAnalysisData(result.data);
+            }
+          }
+          if (scanTime) {
+            this.updateLastScanBadge(scanTime, scanType);
+            try {
+              localStorage.setItem('mirsad_last_scan_time', scanTime);
+              localStorage.setItem('mirsad_last_scan_type', scanType);
+            } catch(e) {}
+            return;
+          }
         }
       }
     } catch (e) {
-      console.warn('[MIRSAD] Could not fetch latest scan from backend:', e.message);
-    }
-
-    // Fallback: try local cache, then static fallback JSON
-    let cached = this.getCachedAnalysis();
-    if (!cached) {
-      try {
-        const fallbackResp = await fetch('js/data/fallback-analysis.json');
-        if (fallbackResp.ok) {
-          cached = await fallbackResp.json();
-          cached._cached_at = cached._scanned_at || new Date().toISOString();
-        }
-      } catch (e) {
-        console.warn('Fallback load failed:', e);
+      if (!isBackgroundPoll) {
+        console.warn('[MIRSAD] Could not fetch latest scan from backend:', e.message);
       }
     }
 
-    if (cached) {
-      this.lastLiveData = cached;
-      this.renderAnalysisData(cached);
-      this.updateLastScanBadge(cached._scanned_at || cached._cached_at, 'fallback');
+    if (!isBackgroundPoll) {
+      // Check localStorage first
+      const savedTime = localStorage.getItem('mirsad_last_scan_time');
+      const savedType = localStorage.getItem('mirsad_last_scan_type') || 'auto';
+      if (savedTime) {
+        this.updateLastScanBadge(savedTime, savedType);
+      }
+
+      // Fallback: try local cache, then static fallback JSON
+      let cached = this.getCachedAnalysis();
+      if (!cached) {
+        try {
+          const fallbackResp = await fetch('js/data/fallback-analysis.json');
+          if (fallbackResp.ok) {
+            cached = await fallbackResp.json();
+          }
+        } catch (e) {
+          console.warn('Fallback load failed:', e);
+        }
+      }
+
+      if (cached) {
+        const scanTime = cached._scanned_at || cached._cached_at || savedTime || new Date().toISOString();
+        this.lastLiveData = cached;
+        this.renderAnalysisData(cached);
+        this.updateLastScanBadge(scanTime, cached._scan_type || savedType);
+      }
     }
   }
 
-  updateLastScanBadge(timestamp, status) {
+  updateLastScanBadge(timestamp, status = 'auto') {
     const badge = document.getElementById('last-scan-badge');
     const text = document.getElementById('last-scan-text');
     if (!badge || !text) return;
@@ -499,26 +543,43 @@ class MirsadApp {
       return;
     }
 
+    this.lastScanTimestamp = timestamp;
+    this.lastScanType = status;
+
     const scanDate = new Date(timestamp);
     const now = new Date();
-    const hoursAgo = Math.round((now - scanDate) / (1000 * 60 * 60));
+    const diffMs = Math.max(0, now - scanDate);
+    const diffMins = Math.round(diffMs / (1000 * 60));
+    const hoursAgo = Math.round(diffMs / (1000 * 60 * 60));
 
-    // Format: "Jul 23, 04:30 IST"
-    const formattedDate = scanDate.toLocaleString('en-IN', {
-      month: 'short', day: 'numeric',
-      timeZone: 'Asia/Kolkata'
-    });
+    // Format IST time
     const formattedTime = scanDate.toLocaleString('en-IN', {
       hour: '2-digit', minute: '2-digit',
       timeZone: 'Asia/Kolkata', hour12: false
     }) + ' IST';
 
-    // Compact text for top bar
-    text.textContent = `Scan: ${formattedTime}`;
+    const formattedDate = scanDate.toLocaleString('en-IN', {
+      month: 'short', day: 'numeric',
+      timeZone: 'Asia/Kolkata'
+    });
+
+    const isToday = now.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' }) ===
+                    scanDate.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+    const modeLabel = status === 'manual' ? 'Manual' : 'Auto';
+
+    // Clear and informative display for both manual and automatic scans
+    if (diffMins < 2) {
+      text.textContent = `Scan (${modeLabel}): Just now (${formattedTime})`;
+    } else if (isToday) {
+      text.textContent = `Scan (${modeLabel}): ${formattedTime}`;
+    } else {
+      text.textContent = `Scan (${modeLabel}): ${formattedDate}, ${formattedTime}`;
+    }
 
     // Detailed hover tooltip
-    let freshness = hoursAgo < 1 ? '< 1h ago' : hoursAgo < 24 ? `${hoursAgo}h ago` : `${Math.round(hoursAgo / 24)}d ago`;
-    badge.title = `MIRSAD Automated Threat Pipeline\nLast Execution: ${formattedDate} at ${formattedTime} (${freshness})\nStatus: Operational (Auto-scans run 3x daily)`;
+    let freshness = diffMins < 2 ? 'Just now' : diffMins < 60 ? `${diffMins}m ago` : hoursAgo < 24 ? `${hoursAgo}h ago` : `${Math.round(hoursAgo / 24)}d ago`;
+    badge.title = `MIRSAD Intelligence Telemetry\nMode: ${status === 'manual' ? 'Manual Threat Scan' : 'Automated Pipeline'}\nLast Execution: ${formattedDate} at ${formattedTime} (${freshness})\nStatus: Operational & Synchronized`;
 
     // Style badge based on freshness
     badge.classList.remove('last-scan-badge--fresh', 'last-scan-badge--stale');
