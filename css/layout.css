@@ -57,6 +57,7 @@ header {
   align-items: center;
   gap: var(--space-2);
   flex-shrink: 0;
+  margin-right: var(--space-6);
 }
 
 .top-bar__logo {
@@ -103,12 +104,11 @@ header {
 .top-bar__nav {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   height: 100%;
-  overflow-x: auto;
   flex: 1;
   min-width: 0;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .top-bar__nav::-webkit-scrollbar {
@@ -172,6 +172,7 @@ header {
   align-items: center;
   gap: var(--space-3);
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 .llm-pool-badge {

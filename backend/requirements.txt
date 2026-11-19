@@ -1,8 +1,7 @@
 fastapi
 uvicorn
-langchain
 langgraph
-langchain-google-genai
+langchain-core
 python-dotenv
 requests
 yfinance

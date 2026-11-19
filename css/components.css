@@ -465,6 +465,33 @@
   color: var(--color-error);
 }
 
+.pipeline-stage__label {
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+  text-align: center;
+  max-width: 52px;
+  line-height: 1.15;
+  word-wrap: break-word;
+}
+
+.pipeline-stage.complete .pipeline-stage__label {
+  color: var(--color-text-secondary);
+}
+
+.pipeline-stage__connector {
+  flex: 1;
+  height: 2px;
+  background: var(--color-border-subtle);
+  margin: 0 4px;
+  margin-bottom: 14px;
+}
+
+.pipeline-stage__connector--active {
+  background: var(--color-success);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+}
+
 /* ── Audit Trail Items ── */
 .audit-entry {
   display: flex;
@@ -723,4 +750,312 @@
 
 .toast__close:hover {
   color: var(--color-text-primary);
+}
+
+/* ── Section Headers & Subsystem Telemetry ── */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border-subtle);
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.section-header__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.section-header__title .icon i {
+  width: 20px;
+  height: 20px;
+  color: var(--color-accent-primary);
+}
+
+.section-header__title h2 {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.section-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.response-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-family-mono);
+  font-size: 11px;
+  color: var(--color-accent-primary);
+  background: var(--color-accent-primary-dim);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.response-time__icon i {
+  width: 12px;
+  height: 12px;
+}
+
+/* ── Active Agents Status ── */
+.agent-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  transition: all var(--transition-fast);
+}
+
+.agent-status:hover {
+  border-color: var(--color-border-default);
+  background: var(--color-surface-3);
+}
+
+.agent-status__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-success);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+  flex-shrink: 0;
+}
+
+.agent-status__name {
+  flex: 1;
+  margin-left: 8px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.agent-status__state {
+  font-family: var(--font-family-mono);
+  font-size: 10px;
+  color: var(--color-success);
+  background: var(--color-success-bg);
+  padding: 2px 7px;
+  border-radius: var(--radius-xs);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+/* ── Scenario Selection Option Controls ── */
+.scenario-option__radio {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-border-default);
+  margin-top: 2px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.scenario-option.selected .scenario-option__radio {
+  border-color: var(--color-accent-primary);
+  background: var(--color-accent-primary);
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.6);
+}
+
+.scenario-option__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* ── Quantitative Metric Badges & Breakdown Tags ── */
+.metric-card__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.metric-card__badge {
+  font-family: var(--font-family-mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: var(--radius-xs);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-card__badge--green, .metric-card__badge--low {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.metric-card__badge--amber, .metric-card__badge--moderate {
+  color: var(--color-warning);
+  background: var(--color-warning-bg);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.metric-card__badge--red, .metric-card__badge--high, .metric-card__badge--critical {
+  color: var(--color-error);
+  background: var(--color-error-bg);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.metric-card__interpretation {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  line-height: 1.45;
+  margin-top: 4px;
+}
+
+.metric-breakdown {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 4px 0;
+}
+
+.breakdown-tag {
+  font-family: var(--font-family-mono);
+  font-size: 10px;
+  color: var(--color-text-secondary);
+  background: var(--color-surface-2);
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--color-border-subtle);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Trajectory Momentum Signals & Direction Pills ── */
+.signal-components {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.signal-chip {
+  font-family: var(--font-family-mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-surface-3);
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.signal-chip--positive {
+  color: var(--color-error);
+  background: var(--color-error-bg);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.signal-chip--negative {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.trajectory-card__direction {
+  font-family: var(--font-family-mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: var(--radius-xs);
+}
+
+.trajectory-card__direction--increasing {
+  color: var(--color-error);
+  background: var(--color-error-bg);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.trajectory-card__direction--decreasing {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.trajectory-card__direction--stable {
+  color: var(--color-warning);
+  background: var(--color-warning-bg);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.trajectory-card__confidence {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  margin-top: 6px;
+  font-family: var(--font-family-mono);
+}
+
+.confidence-bar {
+  height: 4px;
+  background: var(--color-surface-3);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.confidence-bar__fill {
+  height: 100%;
+  background: var(--color-accent-primary);
+  border-radius: var(--radius-full);
+}
+
+/* ── Chokepoint AIS Signals & Chips ── */
+.vessel-signals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.vessel-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-subtle);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+}
+
+.vessel-chip__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.vessel-chip__dot--normal, .vessel-chip__dot--low { background: var(--color-success); }
+.vessel-chip__dot--elevated, .vessel-chip__dot--moderate { background: var(--color-warning); }
+.vessel-chip__dot--high, .vessel-chip__dot--severe, .vessel-chip__dot--critical { background: var(--color-error); }
+
+/* ── Badges & Panels Utilities ── */
+.badge--info {
+  background: var(--color-accent-primary-dim);
+  color: var(--color-accent-primary);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+}
+
+.scroll-panel {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }

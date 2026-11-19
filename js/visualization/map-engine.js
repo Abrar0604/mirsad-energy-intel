@@ -44,11 +44,16 @@ class MapEngine {
       attributionControl: true
     });
 
-    // Dark tile layer
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 19
+    // High-performance Dark Gray Canvas basemap (free, reliable, zero watermarks)
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '© <a href="https://www.esri.com">Esri</a> · USGS, NOAA',
+      maxZoom: 16
+    }).addTo(this.map);
+
+    // Subtle dark labels overlay
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 16,
+      opacity: 0.65
     }).addTo(this.map);
 
     // Add zoom control to top right

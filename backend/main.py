@@ -3,6 +3,7 @@ import logging
 import json
 import os
 import threading
+import gc
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -109,6 +110,7 @@ def startup_event():
     # 2. Fast synchronous BM25 index initialization (< 2ms)
     logger.info("Initializing FactStore BM25 index...")
     fact_store.initialize()
+    gc.collect()
 
 
 class AnalyzeRequest(BaseModel):
@@ -230,6 +232,7 @@ def analyze_risk(request: AnalyzeRequest):
             return fallback_res
         raise HTTPException(status_code=500, detail=str(e))
     finally:
+        gc.collect()
         analysis_lock.release()
 
 

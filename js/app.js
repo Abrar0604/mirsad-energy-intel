@@ -4,8 +4,8 @@
 // ============================================================
 
 import { AgentCoordinator } from './agents/agent-coordinator.js';
-import { MapEngine } from './visualization/map-engine.js';
-import { ChartManager } from './visualization/charts.js';
+import { MapEngine } from './visualization/map-engine.js?v=14';
+import { ChartManager } from './visualization/charts.js?v=14';
 import { AnimationManager } from './visualization/animations.js';
 import { GEOPOLITICAL_EVENTS, EVENT_ICONS } from './data/geopolitical-events.js';
 import { SUPPLY_ROUTES } from './data/supply-routes.js';
@@ -233,7 +233,7 @@ class MirsadApp {
     if (!badge || !text) return;
 
     if (!timestamp) {
-      text.textContent = 'Last Scan: N/A';
+      text.textContent = 'Scan: —';
       return;
     }
 
@@ -242,22 +242,21 @@ class MirsadApp {
     const hoursAgo = Math.round((now - scanDate) / (1000 * 60 * 60));
 
     // Format: "Jul 23, 04:30 IST"
-    const formatted = scanDate.toLocaleString('en-IN', {
+    const formattedDate = scanDate.toLocaleString('en-IN', {
       month: 'short', day: 'numeric',
+      timeZone: 'Asia/Kolkata'
+    });
+    const formattedTime = scanDate.toLocaleString('en-IN', {
       hour: '2-digit', minute: '2-digit',
       timeZone: 'Asia/Kolkata', hour12: false
     }) + ' IST';
 
-    let label = `Last Scan: ${formatted}`;
-    if (hoursAgo < 1) {
-      label += ' (< 1h ago)';
-    } else if (hoursAgo < 24) {
-      label += ` (${hoursAgo}h ago)`;
-    } else {
-      label += ` (${Math.round(hoursAgo / 24)}d ago)`;
-    }
+    // Compact text for top bar
+    text.textContent = `Scan: ${formattedDate}, ${formattedTime}`;
 
-    text.textContent = label;
+    // Detailed hover tooltip
+    let freshness = hoursAgo < 1 ? '< 1h ago' : hoursAgo < 24 ? `${hoursAgo}h ago` : `${Math.round(hoursAgo / 24)}d ago`;
+    badge.title = `MIRSAD Automated Threat Pipeline\nLast Execution: ${formattedDate} at ${formattedTime} (${freshness})\nStatus: Operational (Auto-scans run 3x daily)`;
 
     // Style badge based on freshness
     badge.classList.remove('last-scan-badge--fresh', 'last-scan-badge--stale');
@@ -1245,9 +1244,9 @@ class MirsadApp {
     badge.classList.remove('llm-pool-badge--active', 'llm-pool-badge--degraded', 'llm-pool-badge--down');
 
     if (!poolData) {
-      text.textContent = 'Threat Engine: Active (Deterministic + RAG)';
+      text.textContent = 'Threat Engine: Active';
       badge.classList.add('llm-pool-badge--active');
-      badge.title = 'MIRSAD Deterministic Quantitative Engine & BM25 Knowledge Store Active';
+      badge.title = 'MIRSAD Threat Engine Active\nDeterministic Quantitative Risk Architecture & BM25 Knowledge Store Operational';
       return;
     }
 
@@ -1256,16 +1255,16 @@ class MirsadApp {
     const healthy = poolStatus.filter(c => c.status === 'healthy').length;
 
     if (healthy > 0) {
-      text.textContent = `Threat Engine: AI Augmented (${healthy}/${total})`;
+      text.textContent = `Threat Engine: AI (${healthy}/${total})`;
       badge.classList.add('llm-pool-badge--active');
       const details = poolStatus.map(c =>
         `${c.provider}/${c.model}: ${c.status} (${c.requests_today}/${c.daily_limit} today)`
       ).join('\n');
-      badge.title = `Neural Synthesis Active\n${details}`;
+      badge.title = `Neural Intelligence Active\n${details}`;
     } else {
-      text.textContent = 'Threat Engine: Quantitative + RAG Active';
+      text.textContent = 'Threat Engine: Active';
       badge.classList.add('llm-pool-badge--active');
-      badge.title = 'MIRSAD Deterministic Threat Scoring & BM25 Knowledge Base Active\nOperating autonomously without external API dependency.';
+      badge.title = 'MIRSAD Threat Engine Active\nAutonomous Quantitative Modeling (SSI, HHI, DoA, PSI) + BM25 Sovereign Store active with zero API dependencies.';
     }
   }
 

@@ -173,25 +173,33 @@ class LLMPool:
             raise ValueError(f"Unsupported provider: {cred.provider}")
 
     def _call_gemini(self, cred: LLMCredential, prompt: str, system: str, max_tokens: int) -> str:
-        """Call Google Gemini via langchain-google-genai."""
-        from langchain_google_genai import ChatGoogleGenerativeAI
-        from langchain_core.messages import HumanMessage, SystemMessage
+        """Call Google Gemini REST API directly (zero-dependency, saves ~250MB RAM)."""
+        import requests
 
-        llm = ChatGoogleGenerativeAI(
-            model=cred.model,
-            google_api_key=cred.api_key,
-            temperature=0,
-            max_output_tokens=max_tokens,
-            convert_system_message_to_human=True,
-            request_timeout=15.0,
-            max_retries=0
-        )
-        messages = []
-        if system:
-            messages.append(SystemMessage(content=system))
-        messages.append(HumanMessage(content=prompt))
-        response = llm.invoke(messages)
-        return response.content
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{cred.model}:generateContent?key={cred.api_key}"
+        user_text = (f"{system}\n\n" if system else "") + prompt
+        payload = {
+            "contents": [
+                {
+                    "parts": [{"text": user_text}]
+                }
+            ],
+            "generationConfig": {
+                "maxOutputTokens": max_tokens,
+                "temperature": 0.0
+            }
+        }
+        resp = requests.post(url, json=payload, timeout=15.0)
+        if resp.status_code != 200:
+            raise Exception(f"Gemini API error {resp.status_code}: {resp.text[:300]}")
+        data = resp.json()
+        candidates = data.get("candidates", [])
+        if not candidates or "content" not in candidates[0]:
+            raise Exception(f"No valid candidate returned from Gemini: {data}")
+        parts = candidates[0]["content"].get("parts", [])
+        if not parts:
+            raise Exception(f"Empty parts returned from Gemini: {data}")
+        return parts[0].get("text", "")
 
     def _call_openai(self, cred: LLMCredential, prompt: str, system: str, max_tokens: int) -> str:
         """Call OpenAI-compatible API."""
