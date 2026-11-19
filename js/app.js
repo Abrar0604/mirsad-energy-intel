@@ -613,12 +613,16 @@ class MirsadApp {
           <div class="scenario-option__radio"></div>
           <div>
             <div class="scenario-option__name">${s.icon} ${s.name}</div>
-            <div class="scenario-option__desc">${s.category} · P: ${Math.round(s.probability * 100)}% · ${s.duration_days}d</div>
+            <div class="scenario-option__desc" style="display: flex; gap: 6px; align-items: center; margin-top: 3px;">
+              <span class="badge badge--info" style="font-size: 10px; padding: 1px 6px;">${s.category}</span>
+              <span>Prob. ${Math.round(s.probability * 100)}%</span>
+              <span>${s.duration_days} days</span>
+            </div>
           </div>
         </div>
       `).join('')}
       <button class="btn btn--primary" style="width:100%; margin-top: var(--space-3)" onclick="window.app.runSelectedScenario()">
-        <i data-lucide="zap"></i> Run Simulation
+        <i data-lucide="play"></i> Run Simulation
       </button>
     `;
   }
@@ -748,22 +752,30 @@ class MirsadApp {
     // Recommendation cards
     const gridEl = document.getElementById('procurement-grid');
     if (gridEl) {
+      const levelLabels = {
+        'highly-recommended': 'Highly Recommended',
+        'recommended': 'Recommended',
+        'viable': 'Viable',
+        'limited': 'Constrained'
+      };
+
       gridEl.innerHTML = output.recommendations.slice(0, 8).map(rec => {
         const feasColor = rec.feasibility_score >= 70 ? 'var(--color-success)' :
                           rec.feasibility_score >= 50 ? 'var(--color-warning)' : 'var(--color-risk-high)';
+        const recLabel = levelLabels[rec.recommendation_level] || rec.recommendation_level;
         return `
           <div class="procurement-card">
             <div class="procurement-card__header">
               <div class="procurement-card__rank">${rec.rank}</div>
               <div>
                 <div class="procurement-card__title">${rec.supplier.flag} ${rec.supplier.name}</div>
-                <div class="procurement-card__subtitle">${rec.supplier.region} · ${rec.supplier.crude_grades.slice(0, 2).join(', ')}</div>
+                <div class="procurement-card__subtitle">${rec.supplier.region} (${rec.supplier.crude_grades.slice(0, 2).join(', ')})</div>
               </div>
-              <span class="badge badge--${rec.recommendation_level === 'highly-recommended' ? 'low' : rec.recommendation_level === 'recommended' ? 'moderate' : 'elevated'}">${rec.recommendation_level}</span>
+              <span class="badge badge--${rec.recommendation_level === 'highly-recommended' ? 'low' : rec.recommendation_level === 'recommended' ? 'moderate' : 'elevated'}">${recLabel}</span>
             </div>
             <div class="procurement-card__metrics">
               <div class="procurement-card__metric">
-                <div class="procurement-card__metric-value">${(rec.available_volume_bpd / 1000).toFixed(0)}K</div>
+                <div class="procurement-card__metric-value">${(rec.available_volume_bpd / 1000).toFixed(0)}k</div>
                 <div class="procurement-card__metric-label">Avail. (bpd)</div>
               </div>
               <div class="procurement-card__metric">
@@ -772,11 +784,11 @@ class MirsadApp {
               </div>
               <div class="procurement-card__metric">
                 <div class="procurement-card__metric-value">${rec.time_to_first_barrel_days}d</div>
-                <div class="procurement-card__metric-label">First Barrel</div>
+                <div class="procurement-card__metric-label">First barrel</div>
               </div>
               <div class="procurement-card__metric">
                 <div class="procurement-card__metric-value">${rec.gap_coverage_pct}%</div>
-                <div class="procurement-card__metric-label">Gap Cover</div>
+                <div class="procurement-card__metric-label">Gap cover</div>
               </div>
             </div>
             <div class="procurement-card__feasibility">
@@ -789,8 +801,8 @@ class MirsadApp {
               </div>
             </div>
             <div class="procurement-card__actions">
-              <button class="btn btn--sm btn--primary" style="flex:1">Execute Order</button>
-              <button class="btn btn--sm" style="flex:1">View Details</button>
+              <button class="btn btn--sm btn--primary" style="flex:1"><i data-lucide="check-circle" style="width:13px;height:13px"></i> Allocate Quota</button>
+              <button class="btn btn--sm" style="flex:1"><i data-lucide="file-text" style="width:13px;height:13px"></i> Route Spec</button>
             </div>
           </div>
         `;
@@ -816,7 +828,7 @@ class MirsadApp {
             <div class="spr-site__icon"><i data-lucide="database"></i></div>
             <div class="spr-site__info">
               <div class="spr-site__name">${site.site_name}</div>
-              <div class="spr-site__capacity">${site.capacity_mmt} MMT capacity · ${(site.planned_drawdown_bpd / 1000).toFixed(0)}K bpd release</div>
+              <div class="spr-site__capacity"><span class="font-mono">${site.capacity_mmt} MMT</span> capacity, <span class="font-mono">${(site.planned_drawdown_bpd / 1000).toFixed(0)}k bpd</span> release</div>
             </div>
             <div class="spr-site__level">
               <div class="spr-site__level-value" style="color: ${fillColor}">${site.current_fill_pct}%</div>
@@ -838,7 +850,7 @@ class MirsadApp {
           <div class="scenario-option__radio"></div>
           <div>
             <div class="scenario-option__name">${s.name}</div>
-            <div class="scenario-option__desc">${s.daysOfCover} days cover · ${s.gapCoverage}% gap coverage</div>
+            <div class="scenario-option__desc"><span class="font-mono">${s.daysOfCover} days</span> cover, <span class="font-mono">${s.gapCoverage}%</span> gap offset</div>
           </div>
         </div>
       `).join('');
@@ -1043,11 +1055,15 @@ class MirsadApp {
         </div>
         <div class="metric-card__value metric-card__value--${m.color}">${m.value}${m.unit}</div>
         ${m.extra ? `<div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px;">${m.extra}</div>` : ''}
-        ${m.breakdown ? `<div style="font-size: 10px; color: var(--color-text-tertiary); margin-bottom: 4px;">
-          SPR: ${m.breakdown.spr_days}d · Transit: ${m.breakdown.transit_days}d · Contracted: ${m.breakdown.contracted_days}d
+        ${m.breakdown ? `<div class="metric-breakdown">
+          <span class="breakdown-tag">SPR ${m.breakdown.spr_days}d</span>
+          <span class="breakdown-tag">Transit ${m.breakdown.transit_days}d</span>
+          <span class="breakdown-tag">Contracted ${m.breakdown.contracted_days}d</span>
         </div>` : ''}
-        ${m.components ? `<div style="font-size: 10px; color: var(--color-text-tertiary); margin-bottom: 4px;">
-          SPR: ${m.components.spr_cover}% · Diversity: ${m.components.supplier_diversity}% · Routes: ${m.components.route_diversity}%
+        ${m.components ? `<div class="metric-breakdown">
+          <span class="breakdown-tag">SPR ${m.components.spr_cover}%</span>
+          <span class="breakdown-tag">Diversity ${m.components.supplier_diversity}%</span>
+          <span class="breakdown-tag">Routes ${m.components.route_diversity}%</span>
         </div>` : ''}
         <div class="metric-card__formula">${m.formula}</div>
         <div class="metric-card__interpretation">${m.interpretation}</div>

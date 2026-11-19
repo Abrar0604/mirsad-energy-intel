@@ -75,11 +75,9 @@
   --gradient-accent-border: var(--color-accent-primary);
   --gradient-danger-border: var(--color-risk-critical);
 
-  /* ── Typography ── */
-  /* Replacing Inter with a softer serif or sans-serif combination if possible, 
-     but keeping existing stack and just making it lighter visually */
-  --font-family-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-family-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  /* ── Typography Scale & OpenType ── */
+  --font-family-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
 
   --font-size-xs: 0.6875rem;    /* 11px */
   --font-size-sm: 0.75rem;      /* 12px */
@@ -104,11 +102,11 @@
   --line-height-normal: 1.5;
   --line-height-relaxed: 1.65;
 
-  --letter-spacing-tight: -0.01em;
+  --letter-spacing-tight: -0.015em;
   --letter-spacing-normal: 0;
-  --letter-spacing-wide: 0.02em;
-  --letter-spacing-wider: 0.04em;
-  --letter-spacing-widest: 0.08em;
+  --letter-spacing-wide: 0.01em;
+  --letter-spacing-wider: 0.02em;
+  --letter-spacing-widest: 0.04em;
 
   /* ── Spacing ── */
   --space-1: 0.25rem;   /* 4px */
@@ -122,24 +120,23 @@
   --space-12: 3rem;     /* 48px */
   --space-16: 4rem;     /* 64px */
 
-  /* ── Border Radius ── */
-  /* Slightly more rounded for a softer look */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 24px;
+  /* ── Border Radius (Refined, crisp institutional geometry) ── */
+  --radius-xs: 3px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-2xl: 14px;
   --radius-full: 9999px;
 
-  /* ── Shadows ── */
-  /* Soft, diffused shadows */
-  --shadow-sm: 0 1px 3px rgba(45, 55, 50, 0.05);
-  --shadow-md: 0 4px 12px rgba(45, 55, 50, 0.08);
-  --shadow-lg: 0 12px 32px rgba(45, 55, 50, 0.12);
-  --shadow-xl: 0 20px 48px rgba(45, 55, 50, 0.15);
-  --shadow-glow-accent: 0 0 16px var(--color-accent-glow);
-  --shadow-glow-danger: 0 0 16px var(--color-risk-critical-glow);
-  --shadow-inset: inset 0 1px 0 rgba(0, 0, 0, 0.02);
+  /* ── Shadows (Tactile, restrained elevation) ── */
+  --shadow-sm: 0 1px 2px rgba(45, 55, 50, 0.04);
+  --shadow-md: 0 2px 6px rgba(45, 55, 50, 0.06);
+  --shadow-lg: 0 6px 16px rgba(45, 55, 50, 0.08);
+  --shadow-xl: 0 12px 28px rgba(45, 55, 50, 0.1);
+  --shadow-glow-accent: 0 0 12px var(--color-accent-glow);
+  --shadow-glow-danger: 0 0 12px var(--color-risk-critical-glow);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.5);
 
   /* ── Transitions ── */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -202,6 +199,7 @@ body {
   line-height: var(--line-height-normal);
   color: var(--color-text-primary);
   background: var(--color-bg-primary);
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   overflow: hidden;
   height: 100vh;
   width: 100vw;
@@ -225,7 +223,10 @@ body {
 .font-bold { font-weight: var(--font-weight-bold); }
 .font-extrabold { font-weight: var(--font-weight-extrabold); }
 
-.font-mono { font-family: var(--font-family-mono); }
+.font-mono { 
+  font-family: var(--font-family-mono);
+  font-variant-numeric: tabular-nums;
+}
 
 .text-primary { color: var(--color-text-primary); }
 .text-secondary { color: var(--color-text-secondary); }

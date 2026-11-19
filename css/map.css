@@ -274,39 +274,42 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: var(--space-1);
-  background: var(--color-surface-1);
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-full);
-  padding: 4px var(--space-2);
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-md);
+  padding: 3px 6px;
+  box-shadow: var(--shadow-md);
   pointer-events: auto;
 }
 
 .layer-chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
+  gap: 5px;
+  padding: 4px 9px;
   background: transparent;
   border: 1px solid transparent;
-  border-radius: var(--radius-full);
-  color: var(--color-text-tertiary);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
   font-size: 11px;
-  font-weight: var(--font-weight-medium);
+  font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-fast);
 }
 
 .layer-chip:hover {
   color: var(--color-text-primary);
-  background: var(--color-surface-3);
+  background: var(--color-surface-hover);
 }
 
 .layer-chip.active {
-  color: var(--color-accent-primary);
-  background: var(--color-accent-primary-dim);
-  border-color: var(--color-accent-primary);
+  color: var(--color-text-primary);
+  background: var(--color-surface-2);
+  border-color: var(--color-border-strong);
+  font-weight: 600;
 }
 
 /* ── Collapsible Legend Pill ── */
@@ -314,10 +317,12 @@
   position: absolute;
   bottom: var(--space-3);
   left: var(--space-3);
-  z-index: 1000; /* Leaflet controls use 1000, must be high enough */
-  background: var(--color-surface-1);
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
   max-width: 260px;
 }

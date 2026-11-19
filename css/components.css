@@ -7,18 +7,18 @@
 .card {
   background: var(--color-surface-1);
   border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: all var(--transition-normal);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .card:hover {
   border-color: var(--color-border-default);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
 }
 
 .card--glass {
-  background: var(--color-surface-2); /* Replaced glassmorphism with solid surface */
+  background: var(--color-surface-2);
   border: 1px solid var(--color-border-default);
 }
 
@@ -27,7 +27,7 @@
 }
 
 .card--danger {
-  border-color: rgba(199, 123, 118, 0.3); /* Updated to softer red */
+  border-color: rgba(199, 123, 118, 0.3);
 }
 
 .card--critical {
@@ -39,16 +39,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-4);
+  padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .card__title {
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wider);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-transform: none;
+  letter-spacing: -0.01em;
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -129,6 +129,12 @@
   font-size: var(--font-size-xs);
 }
 
+.btn--xs {
+  padding: 2px 8px;
+  font-size: 11px;
+  gap: 4px;
+}
+
 .btn--icon {
   width: 44px;
   height: 44px;
@@ -146,12 +152,12 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  padding: 2px 8px;
+  padding: 2px 7px;
   border-radius: var(--radius-full);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-wide);
-  text-transform: uppercase;
+  font-weight: 550;
+  letter-spacing: normal;
+  text-transform: none;
   white-space: nowrap;
 }
 
@@ -243,8 +249,8 @@
 .risk-gauge__label {
   font-size: var(--font-size-xs);
   color: var(--color-text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wider);
+  text-transform: none;
+  letter-spacing: normal;
   margin-top: var(--space-1);
 }
 
@@ -395,29 +401,29 @@
 .procurement-card {
   background: var(--color-surface-1);
   border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: all var(--transition-normal);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .procurement-card:hover {
-  border-color: var(--color-border-accent);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  border-color: var(--color-border-default);
+  box-shadow: var(--shadow-sm);
 }
 
 .procurement-card__rank {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-md);
-  background: var(--color-accent-primary);
-  color: var(--color-text-inverse);
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-3);
+  color: var(--color-text-primary);
   font-family: var(--font-family-mono);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   flex-shrink: 0;
 }
 
@@ -425,18 +431,20 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-4);
+  padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .procurement-card__title {
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
 }
 
 .procurement-card__subtitle {
   font-size: var(--font-size-xs);
   color: var(--color-text-tertiary);
+  margin-top: 1px;
 }
 
 .procurement-card__metrics {
@@ -448,20 +456,22 @@
 
 .procurement-card__metric {
   text-align: center;
-  padding: var(--space-2);
+  padding: var(--space-1);
 }
 
 .procurement-card__metric-value {
   font-family: var(--font-family-mono);
   font-size: var(--font-size-md);
-  font-weight: var(--font-weight-bold);
+  font-weight: 600;
   color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
 }
 
 .procurement-card__metric-label {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-tertiary);
+  font-size: 11px;
+  color: var(--color-text-secondary);
   margin-top: 2px;
+  font-weight: 450;
 }
 
 .procurement-card__feasibility {
@@ -501,10 +511,10 @@
 .data-table th {
   padding: var(--space-3) var(--space-4);
   text-align: left;
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wider);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: none;
+  letter-spacing: normal;
   font-size: var(--font-size-xs);
   border-bottom: 1px solid var(--color-border-default);
   background: var(--color-surface-2);
@@ -562,9 +572,10 @@
 
 .stat-block__label {
   font-size: var(--font-size-xs);
-  color: var(--color-text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wider);
+  color: var(--color-text-secondary);
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 500;
 }
 
 .stat-block__sublabel {
@@ -668,8 +679,9 @@
 
 .scenario-option__desc {
   font-size: var(--font-size-xs);
-  color: var(--color-text-tertiary);
-  margin-top: 2px;
+  color: var(--color-text-secondary);
+  margin-top: 3px;
+  line-height: 1.4;
 }
 
 /* ── Slider Control ── */
