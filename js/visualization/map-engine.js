@@ -59,6 +59,15 @@ class MapEngine {
     // Add zoom control to top right
     L.control.zoom({ position: 'topright' }).addTo(this.map);
 
+    // Re-render Lucide icons inside Leaflet popups whenever one opens
+    this.map.on('popupopen', (e) => {
+      if (window.lucide && e.popup) {
+        window.lucide.createIcons({
+          root: e.popup.getElement()
+        });
+      }
+    });
+
     // Initialize all layers
     this.initRoutes();
     this.initRefineries();
@@ -76,31 +85,48 @@ class MapEngine {
     SUPPLY_ROUTES.forEach(route => {
       const coords = route.coordinates.map(c => [c[1], c[0]]); // [lat, lng]
       const riskColor = this.getRiskColor(route.current_risk_score);
+      const riskLevel = RiskIntelligenceAgent.getRiskLevel(route.current_risk_score);
       
-      // Main route line
+      // Main visible route line
       const routeLine = L.polyline(coords, {
         color: riskColor,
-        weight: 2.5,
-        opacity: 0.7,
+        weight: 3,
+        opacity: 0.8,
         dashArray: route.current_risk_score > 65 ? '8, 4' : null,
-        className: `route-${RiskIntelligenceAgent.getRiskLevel(route.current_risk_score)}`
+        className: `route-${riskLevel}`
       });
 
-      // Route popup
-      routeLine.bindPopup(this.createRoutePopup(route));
-      routeLine.on('mouseover', function() { this.setStyle({ weight: 4, opacity: 1 }); });
-      routeLine.on('mouseout', function() { this.setStyle({ weight: 2.5, opacity: 0.7 }); });
+      // Generous invisible hit-buffer polyline (18px wide) for easy clickability anywhere along the corridor
+      const hitBuffer = L.polyline(coords, {
+        weight: 18,
+        opacity: 0,
+        interactive: true
+      });
+
+      const popupHtml = this.createRoutePopup(route);
+      routeLine.bindPopup(popupHtml, { offset: [0, -4] });
+      hitBuffer.bindPopup(popupHtml, { offset: [0, -4] });
+
+      const onHover = () => routeLine.setStyle({ weight: 5, opacity: 1 });
+      const onOut = () => routeLine.setStyle({ weight: 3, opacity: 0.8 });
+
+      routeLine.on('mouseover', onHover);
+      routeLine.on('mouseout', onOut);
+      hitBuffer.on('mouseover', onHover);
+      hitBuffer.on('mouseout', onOut);
 
       this.layers.routes.addLayer(routeLine);
+      this.layers.routes.addLayer(hitBuffer);
 
-      // Animated flow dots
+      // Animated flow dots: must have interactive: false so they never intercept clicks
       if (route.status === 'active') {
         const flowDot = L.circleMarker(coords[Math.floor(coords.length / 2)], {
           radius: 3,
           fillColor: riskColor,
           fillOpacity: 0.9,
           color: 'transparent',
-          className: 'animate-pulse-glow'
+          className: 'animate-pulse-glow',
+          interactive: false
         });
         this.layers.routes.addLayer(flowDot);
       }
@@ -115,14 +141,23 @@ class MapEngine {
       const markerHtml = `<div class="map-marker marker-refinery ${isStressed ? 'marker-refinery--stressed' : ''}" 
         title="${refinery.name}"><i data-lucide="factory"></i></div>`;
       
+      // Offset SEZ slightly so Jamnagar DTA and SEZ do not completely occlude each other at low zoom
+      let lat = refinery.coordinates[1];
+      let lng = refinery.coordinates[0];
+      if (refinery.id === 'ref-ril-sez') {
+        lat += 0.12;
+        lng -= 0.14;
+      }
+
       const marker = L.marker(
-        [refinery.coordinates[1], refinery.coordinates[0]], 
+        [lat, lng], 
         {
           icon: L.divIcon({
             html: markerHtml,
             className: 'custom-marker',
             iconSize: [24, 24],
-            iconAnchor: [12, 12]
+            iconAnchor: [12, 12],
+            popupAnchor: [0, -14]
           })
         }
       );
@@ -145,7 +180,8 @@ class MapEngine {
             html: markerHtml,
             className: 'custom-marker',
             iconSize: [28, 28],
-            iconAnchor: [14, 14]
+            iconAnchor: [14, 14],
+            popupAnchor: [0, -16]
           }),
           zIndexOffset: 1000
         }
@@ -170,7 +206,8 @@ class MapEngine {
             html: markerHtml,
             className: 'custom-marker',
             iconSize: [16, 16],
-            iconAnchor: [8, 8]
+            iconAnchor: [8, 8],
+            popupAnchor: [0, -10]
           })
         }
       );
@@ -193,7 +230,8 @@ class MapEngine {
             html: markerHtml,
             className: 'custom-marker',
             iconSize: [26, 26],
-            iconAnchor: [13, 13]
+            iconAnchor: [13, 13],
+            popupAnchor: [0, -14]
           })
         }
       );
@@ -206,38 +244,39 @@ class MapEngine {
   initRiskZones() {
     this.layers.riskZones = L.layerGroup().addTo(this.map);
 
-    // Hormuz risk zone
+    // Hormuz risk zone (non-interactive so it never occludes markers or routes underneath)
     const hormuzZone = L.circle([26.0, 56.4], {
       radius: 150000,
       fillColor: '#dc2626',
       fillOpacity: 0.08,
       color: '#dc2626',
       weight: 1,
-      dashArray: '6, 4'
+      dashArray: '6, 4',
+      interactive: false
     });
-    hormuzZone.bindPopup('<div class="map-popup"><div class="map-popup__title"><i data-lucide="alert-triangle"></i> Hormuz Risk Zone</div><p style="font-size:12px;color:var(--color-text-tertiary)">High-threat area. IRGC naval presence, seizure risk, mine warfare potential.</p></div>');
     this.layers.riskZones.addLayer(hormuzZone);
 
-    // Red Sea risk zone
+    // Red Sea risk zone (non-interactive)
     const redSeaZone = L.circle([15.0, 42.0], {
       radius: 300000,
       fillColor: '#ef4444',
       fillOpacity: 0.06,
       color: '#ef4444',
       weight: 1,
-      dashArray: '6, 4'
+      dashArray: '6, 4',
+      interactive: false
     });
-    redSeaZone.bindPopup('<div class="map-popup"><div class="map-popup__title"><i data-lucide="zap"></i> Red Sea / Houthi Threat Zone</div><p style="font-size:12px;color:var(--color-text-tertiary)">Active threat area. Anti-ship missiles, drones, naval mines deployed.</p></div>');
     this.layers.riskZones.addLayer(redSeaZone);
 
-    // Bab-el-Mandeb risk zone
+    // Bab-el-Mandeb risk zone (non-interactive)
     const babZone = L.circle([12.6, 43.3], {
       radius: 100000,
       fillColor: '#dc2626',
       fillOpacity: 0.1,
       color: '#dc2626',
       weight: 1.5,
-      dashArray: '4, 3'
+      dashArray: '4, 3',
+      interactive: false
     });
     this.layers.riskZones.addLayer(babZone);
   }

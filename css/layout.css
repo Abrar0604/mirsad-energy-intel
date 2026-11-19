@@ -104,11 +104,12 @@ header {
 .top-bar__nav {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   height: 100%;
-  flex: 1;
+  flex: 0 0 auto;
   min-width: 0;
   justify-content: flex-start;
+  margin-right: var(--space-3);
 }
 
 .top-bar__nav::-webkit-scrollbar {
@@ -118,14 +119,14 @@ header {
 .nav-tab {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 0 var(--space-3);
+  gap: 5px;
+  padding: 0 10px;
   height: 100%;
   border: none;
   background: transparent;
   color: var(--color-text-secondary);
   font-family: var(--font-family-ui);
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 500;
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -170,7 +171,7 @@ header {
 .top-bar__status {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
   flex-shrink: 0;
   margin-left: auto;
 }
@@ -233,6 +234,51 @@ header {
   width: 13px;
   height: 13px;
   color: var(--color-text-secondary);
+}
+
+/* ── Tactical Live Scan Button ── */
+.btn-scan-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(2, 132, 199, 0.25));
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: var(--radius-sm);
+  color: #38bdf8;
+  font-family: var(--font-family-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn-scan-trigger:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.3), rgba(2, 132, 199, 0.45));
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
+.btn-scan-trigger:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-scan-trigger i {
+  width: 13px;
+  height: 13px;
+}
+
+.btn-scan-trigger--running i {
+  animation: radar-sweep 1.2s linear infinite;
+}
+
+@keyframes radar-sweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .status-indicator {

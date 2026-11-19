@@ -202,6 +202,11 @@
   border: 2px solid var(--color-risk-critical);
   opacity: 0.5;
   animation: pulse-ring 2s ease infinite;
+  pointer-events: none !important;
+}
+
+.animate-pulse-glow {
+  pointer-events: none !important;
 }
 
 /* Vessel Markers */

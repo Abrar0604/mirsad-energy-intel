@@ -4,8 +4,8 @@
 // ============================================================
 
 import { AgentCoordinator } from './agents/agent-coordinator.js';
-import { MapEngine } from './visualization/map-engine.js?v=14';
-import { ChartManager } from './visualization/charts.js?v=14';
+import { MapEngine } from './visualization/map-engine.js?v=15';
+import { ChartManager } from './visualization/charts.js?v=15';
 import { AnimationManager } from './visualization/animations.js';
 import { GEOPOLITICAL_EVENTS, EVENT_ICONS } from './data/geopolitical-events.js';
 import { SUPPLY_ROUTES } from './data/supply-routes.js';
@@ -77,6 +77,12 @@ class MirsadApp {
 
     // Fetch the latest auto-scan result from backend (falls back to cache/static)
     this.fetchLatestScan();
+
+    // Setup live threat scan trigger button
+    const scanBtn = document.getElementById('btn-trigger-scan');
+    if (scanBtn) {
+      scanBtn.addEventListener('click', () => this.triggerLiveScan());
+    }
 
     // Update time
     this.updateClock();
@@ -189,6 +195,55 @@ class MirsadApp {
     this.renderAuditTrail(this.coordinator.getAuditTrail());
   }
 
+  async triggerLiveScan() {
+    const btn = document.getElementById('btn-trigger-scan');
+    const text = document.getElementById('scan-btn-text');
+    if (!btn || btn.disabled) return;
+
+    try {
+      btn.disabled = true;
+      btn.classList.add('btn-scan-trigger--running');
+      if (text) text.textContent = 'Scanning Telemetry...';
+
+      const resp = await fetch('https://mirsad-energy-intel.onrender.com/api/analyze-risk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          topic: 'Middle East crude oil supply disruption risk Hormuz Bab-el-Mandeb'
+        })
+      });
+
+      if (!resp.ok) {
+        throw new Error(`HTTP ${resp.status}`);
+      }
+
+      const scanResult = await resp.json();
+      console.log('[MIRSAD] Live scan completed successfully:', scanResult);
+
+      this.lastLiveData = scanResult;
+      this.cacheAnalysisData(scanResult);
+      this.renderAnalysisData(scanResult);
+      this.updateLastScanBadge(scanResult.timestamp || scanResult._scanned_at, 'success');
+
+      if (text) text.textContent = 'Scan Complete';
+      setTimeout(() => {
+        if (text) text.textContent = 'Run Threat Scan';
+        btn.disabled = false;
+        btn.classList.remove('btn-scan-trigger--running');
+        if (window.lucide) lucide.createIcons();
+      }, 3000);
+    } catch (e) {
+      console.error('[MIRSAD] Live scan trigger failed:', e);
+      if (text) text.textContent = 'Scan Failed';
+      setTimeout(() => {
+        if (text) text.textContent = 'Run Threat Scan';
+        btn.disabled = false;
+        btn.classList.remove('btn-scan-trigger--running');
+        if (window.lucide) lucide.createIcons();
+      }, 3000);
+    }
+  }
+
   async fetchLatestScan() {
     try {
       const response = await fetch('https://mirsad-energy-intel.onrender.com/api/latest-scan');
@@ -252,7 +307,7 @@ class MirsadApp {
     }) + ' IST';
 
     // Compact text for top bar
-    text.textContent = `Scan: ${formattedDate}, ${formattedTime}`;
+    text.textContent = `Scan: ${formattedTime}`;
 
     // Detailed hover tooltip
     let freshness = hoursAgo < 1 ? '< 1h ago' : hoursAgo < 24 ? `${hoursAgo}h ago` : `${Math.round(hoursAgo / 24)}d ago`;

@@ -20,11 +20,11 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/design-system.css?v=14">
-  <link rel="stylesheet" href="css/layout.css?v=14">
-  <link rel="stylesheet" href="css/components.css?v=14">
-  <link rel="stylesheet" href="css/dashboard.css?v=14">
-  <link rel="stylesheet" href="css/map.css?v=14">
+  <link rel="stylesheet" href="css/design-system.css?v=15">
+  <link rel="stylesheet" href="css/layout.css?v=15">
+  <link rel="stylesheet" href="css/components.css?v=15">
+  <link rel="stylesheet" href="css/dashboard.css?v=15">
+  <link rel="stylesheet" href="css/map.css?v=15">
 </head>
 <body>
 
@@ -61,7 +61,7 @@
         </button>
       </nav>
 
-      <div class="top-bar__status" style="display: flex; gap: var(--space-3); align-items: center;">
+      <div class="top-bar__status">
         <!-- LLM Pool Health Badge -->
         <div id="llm-pool-badge" class="llm-pool-badge" title="LLM Pool Status">
           <i data-lucide="cpu"></i>
@@ -71,6 +71,10 @@
           <i data-lucide="clock"></i>
           <span id="last-scan-text">Last Scan: Loading...</span>
         </div>
+        <button id="btn-trigger-scan" class="btn-scan-trigger" title="Run real-time intelligence scan via Render backend">
+          <i data-lucide="radar"></i>
+          <span id="scan-btn-text">Run Threat Scan</span>
+        </button>
         <div style="display: flex; flex-direction: column; align-items: flex-end;">
           <div class="status-indicator">
             <div class="status-indicator__dot"></div>
@@ -456,7 +460,7 @@
 </div>
 
 <!-- Main App Script -->
-<script type="module" src="js/app.js?v=14"></script>
+<script type="module" src="js/app.js?v=15"></script>
 
 </body>
 </html>
