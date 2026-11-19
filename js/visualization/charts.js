@@ -112,7 +112,7 @@ class ChartManager {
         datasets: [{
           data: suppliers.map(s => s.india_import_share),
           backgroundColor: colors.slice(0, suppliers.length),
-          borderColor: '#131829',
+          borderColor: '#111a2d',
           borderWidth: 2,
           hoverOffset: 8
         }]
@@ -451,7 +451,7 @@ class ChartManager {
           borderColor: '#ef4444',
           borderWidth: 2,
           pointBackgroundColor: '#ef4444',
-          pointBorderColor: '#1a2035',
+          pointBorderColor: '#111a2d',
           pointBorderWidth: 2,
           pointRadius: 4
         }]

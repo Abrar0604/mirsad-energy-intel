@@ -1,6 +1,6 @@
 /* ============================================================
    MIRSAD — Layout System
-   Grid layout, navigation, responsive design
+   Grid layout, tactical navigation, operational workspace
    ============================================================ */
 
 header {
@@ -8,6 +8,7 @@ header {
   max-width: 100vw;
   min-width: 0;
   overflow: hidden;
+  background: var(--color-bg-primary);
 }
 
 /* ── Main App Shell ── */
@@ -21,6 +22,7 @@ header {
   min-height: 0;
   overflow: hidden;
   background: var(--color-bg-primary);
+  color: var(--color-text-primary);
 }
 
 /* ── Top Bar ── */
@@ -29,7 +31,7 @@ header {
   align-items: center;
   justify-content: space-between;
   height: 52px;
-  padding: 0 var(--space-3);
+  padding: 0 var(--space-4);
   background: var(--color-surface-1);
   border-bottom: 1px solid var(--color-border-subtle);
   z-index: var(--z-sticky);
@@ -47,7 +49,7 @@ header {
   left: 0;
   right: 0;
   height: 1px;
-  background: var(--color-border-subtle);
+  background: linear-gradient(90deg, rgba(6, 182, 212, 0.4) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(245, 158, 11, 0.4) 100%);
 }
 
 .top-bar__brand {
@@ -60,38 +62,48 @@ header {
 .top-bar__logo {
   width: 32px;
   height: 32px;
-  background: var(--color-accent-primary);
-  color: var(--color-text-inverse);
-  border-radius: var(--radius-lg);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-accent);
+  color: var(--color-accent-primary);
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--font-size-lg);
-  box-shadow: var(--shadow-sm);
+  font-size: var(--font-size-md);
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
 }
 
 .top-bar__title {
   font-size: 15px;
   font-weight: 700;
-  letter-spacing: -0.015em;
+  letter-spacing: 0.04em;
   color: var(--color-text-primary);
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.top-bar__title-ar {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-accent-gold);
+  opacity: 0.85;
 }
 
 .top-bar__subtitle {
   font-size: var(--font-size-xs);
   color: var(--color-text-tertiary);
-  letter-spacing: normal;
-  text-transform: none;
   margin-left: var(--space-2);
   padding-left: var(--space-2);
   border-left: 1px solid var(--color-border-subtle);
+  font-weight: 400;
 }
 
 /* ── Navigation Tabs ── */
 .top-bar__nav {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
+  gap: 2px;
   height: 100%;
   overflow-x: auto;
   flex: 1;
@@ -115,8 +127,6 @@ header {
   font-family: var(--font-family-ui);
   font-size: 13px;
   font-weight: 500;
-  letter-spacing: normal;
-  text-transform: none;
   cursor: pointer;
   transition: all var(--transition-fast);
   position: relative;
@@ -129,7 +139,7 @@ header {
 }
 
 .nav-tab.active {
-  color: var(--color-text-primary);
+  color: var(--color-accent-primary);
   font-weight: 600;
 }
 
@@ -141,48 +151,115 @@ header {
   right: var(--space-3);
   height: 2px;
   background: var(--color-accent-primary);
-  border-radius: var(--radius-full);
+  box-shadow: 0 0 8px var(--color-accent-primary);
 }
 
 .nav-tab__icon {
   font-size: var(--font-size-md);
-  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  opacity: 0.75;
 }
 
 .nav-tab.active .nav-tab__icon {
   opacity: 1;
+  color: var(--color-accent-primary);
 }
 
 /* ── Status Indicators in Top Bar ── */
 .top-bar__status {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
   flex-shrink: 0;
+}
+
+.llm-pool-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-accent-primary);
+  font-family: var(--font-family-mono);
+  font-variant-numeric: tabular-nums;
+  cursor: default;
+  transition: all var(--transition-fast);
+}
+
+.llm-pool-badge i {
+  width: 13px;
+  height: 13px;
+}
+
+.llm-pool-badge--active {
+  background: rgba(6, 182, 212, 0.1);
+  border-color: rgba(6, 182, 212, 0.3);
+  color: var(--color-accent-primary);
+}
+
+.llm-pool-badge--degraded {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: var(--color-accent-gold);
+}
+
+.llm-pool-badge--down {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--color-risk-critical);
+}
+
+.last-scan-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  font-family: var(--font-family-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.last-scan-badge i {
+  width: 13px;
+  height: 13px;
+  color: var(--color-text-secondary);
 }
 
 .status-indicator {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 6px;
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
+  font-weight: 500;
 }
 
 .status-indicator__dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--color-success);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
   animation: pulse-glow 2s ease-in-out infinite;
 }
 
 .status-indicator__dot--warning {
   background: var(--color-warning);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.8);
 }
 
 .status-indicator__dot--danger {
   background: var(--color-error);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
   animation: critical-pulse 1.5s ease-in-out infinite;
 }
 
@@ -190,11 +267,11 @@ header {
 .kpi-ticker {
   display: flex;
   align-items: center;
-  height: 36px;
-  padding: 0 var(--space-3);
-  background: var(--color-bg-secondary);
+  height: 38px;
+  padding: 0 var(--space-4);
+  background: var(--color-bg-primary);
   border-bottom: 1px solid var(--color-border-subtle);
-  gap: var(--space-4);
+  gap: var(--space-5);
   overflow-x: auto;
   width: 100%;
   max-width: 100vw;
@@ -215,10 +292,8 @@ header {
 
 .kpi-item__label {
   font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
+  color: var(--color-text-tertiary);
   font-weight: 500;
-  text-transform: none;
-  letter-spacing: normal;
 }
 
 .kpi-item__value {
@@ -231,10 +306,10 @@ header {
 
 .kpi-item__change {
   font-family: var(--font-family-mono);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  padding: 1px 6px;
-  border-radius: var(--radius-sm);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: var(--radius-xs);
 }
 
 .kpi-item__change--up {
@@ -249,7 +324,7 @@ header {
 
 .kpi-divider {
   width: 1px;
-  height: 16px;
+  height: 14px;
   background: var(--color-border-default);
   flex-shrink: 0;
 }
@@ -263,6 +338,7 @@ header {
   min-width: 0;
   width: 100%;
   max-width: 100vw;
+  background: var(--color-bg-secondary);
 }
 
 /* ── View Panels ── */
@@ -279,13 +355,13 @@ header {
 
 .view-panel.active {
   display: grid;
-  animation: fade-in 0.3s ease;
+  animation: fade-in 0.25s ease;
 }
 
 /* ── Command Center Layout ── */
 .command-center {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
+  grid-template-columns: minmax(0, 1fr) 360px;
   grid-template-rows: 1fr;
   gap: 0;
   height: 100%;
@@ -294,6 +370,7 @@ header {
   min-width: 0;
   min-height: 0;
   overflow: hidden;
+  background: var(--color-bg-primary);
 }
 
 .command-center__map {
@@ -301,6 +378,7 @@ header {
   overflow: hidden;
   min-width: 0;
   min-height: 0;
+  background: var(--color-bg-primary);
 }
 
 .command-center__sidebar {
@@ -316,7 +394,7 @@ header {
 /* ── Sidebar Tabs ── */
 .sidebar-tabs {
   display: flex;
-  background: var(--color-surface-2);
+  background: var(--color-bg-tertiary);
   border-bottom: 1px solid var(--color-border-subtle);
   flex-shrink: 0;
 }
@@ -326,10 +404,10 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: var(--space-2) var(--space-1);
+  gap: 5px;
+  padding: 10px 4px;
   font-size: 11px;
-  font-weight: var(--font-weight-medium);
+  font-weight: 500;
   color: var(--color-text-tertiary);
   background: transparent;
   border: none;
@@ -341,14 +419,14 @@ header {
 
 .sidebar-tab:hover {
   color: var(--color-text-primary);
-  background: var(--color-surface-3);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .sidebar-tab.active {
   color: var(--color-accent-primary);
   background: var(--color-surface-1);
   border-bottom-color: var(--color-accent-primary);
-  font-weight: var(--font-weight-semibold);
+  font-weight: 600;
 }
 
 .sidebar-tab-panel {
@@ -363,29 +441,44 @@ header {
   display: flex;
 }
 
+.sidebar-section {
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.sidebar-section:last-child {
+  border-bottom: none;
+}
+
+.sidebar-section__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-3);
+  letter-spacing: 0.02em;
+}
+
+.sidebar-section__title i {
+  width: 14px;
+  height: 14px;
+  color: var(--color-accent-primary);
+}
+
 /* ── Risk Intelligence Layout ── */
 .risk-intel {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-3);
+  gap: var(--space-4);
+  padding: var(--space-5);
   overflow-y: auto;
   overflow-x: hidden;
   min-height: 0;
   height: 100%;
+  background: var(--color-bg-secondary);
   -webkit-overflow-scrolling: touch;
-}
-
-/* Smooth scrollbar styling */
-.risk-intel::-webkit-scrollbar {
-  width: 6px;
-}
-.risk-intel::-webkit-scrollbar-track {
-  background: transparent;
-}
-.risk-intel::-webkit-scrollbar-thumb {
-  background: var(--color-border-subtle);
-  border-radius: 3px;
 }
 
 .ri-section {
@@ -396,22 +489,25 @@ header {
 .ri-header {
   margin-bottom: var(--space-2);
 }
+
 .ri-header__title {
   display: flex;
   align-items: center;
   gap: var(--space-2);
 }
+
 .ri-header__title h2 {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl);
   font-weight: 700;
   margin: 0;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
 }
 
-/* Charts side-by-side row */
 .ri-charts-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-3);
+  gap: var(--space-4);
 }
 
 .ri-card {
@@ -421,19 +517,20 @@ header {
 }
 
 .ri-chart-body {
-  min-height: 200px;
-  max-height: 240px;
+  min-height: 220px;
+  max-height: 260px;
   flex: 1;
 }
 
 /* ── Scenario Modeller Layout ── */
 .scenario-view {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 360px 1fr;
   grid-template-rows: 1fr;
   gap: 0;
   height: 100%;
   min-height: 0;
+  background: var(--color-bg-secondary);
 }
 
 .scenario-view__controls {
@@ -442,223 +539,90 @@ header {
   background: var(--color-surface-1);
   border-right: 1px solid var(--color-border-subtle);
   overflow-y: auto;
-  padding: var(--space-3);
+  padding: var(--space-5);
 }
 
 .scenario-view__results {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-3);
   overflow-y: auto;
-  overflow-x: hidden;
-  min-height: 0;
-  -webkit-overflow-scrolling: touch;
+  padding: var(--space-5);
+  gap: var(--space-4);
 }
 
-/* ── Procurement Layout ── */
+/* ── Procurement View Layout ── */
 .procurement-view {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: auto 1fr;
-  gap: var(--space-3);
-  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
   overflow-y: auto;
   min-height: 0;
+  height: 100%;
+  background: var(--color-bg-secondary);
 }
 
-/* ── Reserves Layout ── */
+.procurement-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-4);
+}
+
+/* ── Reserves View Layout ── */
 .reserves-view {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto 1fr;
-  gap: var(--space-3);
-  padding: var(--space-3);
+  grid-template-columns: 1fr 1.25fr;
+  gap: var(--space-5);
+  padding: var(--space-5);
   overflow-y: auto;
   min-height: 0;
+  height: 100%;
+  background: var(--color-bg-secondary);
 }
 
 .reserves-view__header {
   grid-column: 1 / -1;
 }
 
-/* ── Section Headers ── */
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-4);
-}
-
-.section-header__title {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.section-header__title h2 {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-tight);
-}
-
-.section-header__title .icon {
-  font-size: var(--font-size-2xl);
-}
-
-.section-header__actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-/* ── Sidebar Sections ── */
-.sidebar-section {
-  padding: var(--space-4);
-  border-bottom: 1px solid var(--color-border-subtle);
-}
-
-.sidebar-section__title {
-  font-size: var(--font-size-xs);
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  text-transform: none;
-  letter-spacing: normal;
-  margin-bottom: var(--space-2);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-/* ── Scrollable Panels ── */
-.scroll-panel {
-  overflow-y: auto;
-  flex: 1;
-}
-
-/* ── Responsive Media Queries ── */
-@media (max-width: 1440px) {
-  .command-center {
-    grid-template-columns: 1fr 300px;
-  }
-  .scenario-view {
-    grid-template-columns: 280px 1fr;
-  }
-}
-
-@media (max-width: 1200px) {
-  .command-center {
-    grid-template-columns: 1fr 280px;
-  }
-  .top-bar__subtitle {
-    display: none;
-  }
-  .nav-tab {
-    padding: var(--space-1);
-    font-size: 11px;
-  }
-}
-
+/* ── Responsive Layout Overrides ── */
 @media (max-width: 1024px) {
   .command-center {
-    grid-template-columns: 1fr 260px;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+  }
+  .command-center__sidebar {
+    height: 380px;
+    border-left: none;
+    border-top: 1px solid var(--color-border-subtle);
   }
   .ri-charts-row {
     grid-template-columns: 1fr;
   }
-  .metrics-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-  .trajectory-container {
-    grid-template-columns: 1fr !important;
-  }
-  .scenario-view__results {
+  .scenario-view {
     grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+  .scenario-view__controls {
+    border-right: none;
+    border-bottom: 1px solid var(--color-border-subtle);
   }
   .reserves-view {
     grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 768px) { /* Mobile specific layout */
-  /* Top Nav becomes Bottom Nav */
-  .top-bar__nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--color-surface-1);
-    border-top: 1px solid var(--color-border-subtle);
-    justify-content: space-around;
-    z-index: var(--z-sticky);
-    height: 64px;
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-  
-  .nav-tab {
-    flex-direction: column;
-    justify-content: center;
-    gap: 4px;
-    font-size: 10px;
-    padding: var(--space-2);
-    min-width: 44px; /* Touch target */
-    min-height: 44px; /* Touch target */
-  }
-  
-  .nav-tab.active::after {
-    top: 0;
-    bottom: auto;
-    border-radius: 0 0 var(--radius-full) var(--radius-full);
-  }
-
-  /* Make room for bottom nav */
-  .main-content {
-    padding-bottom: 64px;
-  }
-
-  /* Adjust Top Bar */
-  .top-bar {
-    padding: 0 var(--space-2);
-  }
-  .top-bar__subtitle {
-    display: none;
-  }
-  .status-indicator > span {
-    display: none; /* Hide "System Active" text, keep dot */
-  }
-
-  /* Stack view layouts vertically */
-  .command-center {
-    grid-template-columns: 1fr;
-    grid-template-rows: 50vh auto;
-    overflow-y: auto;
-  }
-  .command-center__sidebar {
-    border-left: none;
-    border-top: 1px solid var(--color-border-subtle);
-  }
-  .scenario-view {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
-    overflow-y: auto;
-  }
-  .scenario-view__controls {
-    border-right: none;
-    border-bottom: 1px solid var(--color-border-subtle);
-  }
+/* ── Animations ── */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-@media (max-width: 480px) {
-  .metrics-grid {
-    grid-template-columns: 1fr !important;
-  }
-  .ri-charts-row {
-    grid-template-columns: 1fr;
-  }
-  .sources-summary {
-    flex-direction: column;
-  }
-  .vessel-signals {
-    grid-template-columns: 1fr;
-  }
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+@keyframes critical-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.7); }
 }

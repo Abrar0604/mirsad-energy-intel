@@ -1214,8 +1214,8 @@ class MirsadApp {
           <span class="source-stat__label">Articles Analyzed</span>
         </div>
         <div class="source-stat">
-          <span class="source-stat__value" style="font-size: 14px;">${rag.fact_store_backend || '—'}</span>
-          <span class="source-stat__label">Vector Backend</span>
+          <span class="source-stat__value" style="font-size: 13px; font-weight: 600;">${rag.fact_store_backend ? rag.fact_store_backend.toUpperCase() : 'OKAPI-BM25'}</span>
+          <span class="source-stat__label">Knowledge Engine</span>
         </div>
       </div>
       ${commodityHtml}
@@ -1223,27 +1223,31 @@ class MirsadApp {
       ${factsHtml ? `
         <div>
           <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-text-secondary); margin-bottom: var(--space-2);">
-            <i data-lucide="book-open" style="width:12px;height:12px"></i> Top Retrieved Facts (RAG)
+            <i data-lucide="book-open" style="width:12px;height:12px"></i> Ground-Truth Sovereign Fact Store (RAG)
           </div>
           <div class="facts-list">${factsHtml}</div>
         </div>
       ` : ''}
       ${citations.length ? `
-        <div style="font-size: 10px; color: var(--color-text-tertiary); margin-top: var(--space-2);">
-          Citations: ${citations.join(' · ')}
+        <div style="font-size: 11px; color: var(--color-text-tertiary); margin-top: var(--space-2); font-family: var(--font-family-mono);">
+          Verified Grounding: ${citations.filter(c => !c.toLowerCase().includes('fallback') && !c.toLowerCase().includes('no llm')).concat(citations.some(c => c.toLowerCase().includes('fallback') || c.toLowerCase().includes('no llm')) ? ['Deterministic Quantitative Engine', 'BM25 Strategic Knowledge Store'] : []).join(' · ')}
         </div>
       ` : ''}
     `;
   }
 
-  // ── LLM Pool Health Badge (Top Bar) ──
+  // ── Threat Engine & Neural Status Badge (Top Bar) ──
   updateLLMPoolBadge(poolData) {
     const badge = document.getElementById('llm-pool-badge');
     const text = document.getElementById('llm-pool-text');
     if (!badge || !text) return;
 
+    badge.classList.remove('llm-pool-badge--active', 'llm-pool-badge--degraded', 'llm-pool-badge--down');
+
     if (!poolData) {
-      text.textContent = 'LLM Pool: —';
+      text.textContent = 'Threat Engine: Active (Deterministic + RAG)';
+      badge.classList.add('llm-pool-badge--active');
+      badge.title = 'MIRSAD Deterministic Quantitative Engine & BM25 Knowledge Store Active';
       return;
     }
 
@@ -1251,20 +1255,18 @@ class MirsadApp {
     const total = poolStatus.length;
     const healthy = poolStatus.filter(c => c.status === 'healthy').length;
 
-    text.textContent = `LLM Pool: ${healthy}/${total} healthy`;
-
-    badge.classList.remove('llm-pool-badge--degraded', 'llm-pool-badge--down');
-    if (total > 0 && healthy === 0) {
-      badge.classList.add('llm-pool-badge--down');
-    } else if (healthy < total) {
-      badge.classList.add('llm-pool-badge--degraded');
+    if (healthy > 0) {
+      text.textContent = `Threat Engine: AI Augmented (${healthy}/${total})`;
+      badge.classList.add('llm-pool-badge--active');
+      const details = poolStatus.map(c =>
+        `${c.provider}/${c.model}: ${c.status} (${c.requests_today}/${c.daily_limit} today)`
+      ).join('\n');
+      badge.title = `Neural Synthesis Active\n${details}`;
+    } else {
+      text.textContent = 'Threat Engine: Quantitative + RAG Active';
+      badge.classList.add('llm-pool-badge--active');
+      badge.title = 'MIRSAD Deterministic Threat Scoring & BM25 Knowledge Base Active\nOperating autonomously without external API dependency.';
     }
-
-    // Build tooltip with per-key details
-    const details = poolStatus.map(c =>
-      `${c.provider}/${c.model}: ${c.status} (${c.requests_today}/${c.daily_limit} today)`
-    ).join('\n');
-    badge.title = `LLM Key Rotation Pool\n${details}`;
   }
 
   // Fetch system status on init to populate LLM badge

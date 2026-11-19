@@ -1,79 +1,78 @@
 /* ============================================================
    MIRSAD (مرصاد) — Design System
-   AI-Powered Energy Supply Chain Resilience Platform
+   Sovereign Energy Supply Chain Intelligence & Command Console
+   Tactical Dark Maritime Theme
    ============================================================ */
 
 /* ── Google Fonts ── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 /* ── CSS Custom Properties ── */
 :root {
-  /* ── Surface Colors ── */
-  --color-bg-primary: #f7f9f7;     /* Soft off-white/very light sage */
-  --color-bg-secondary: #ffffff;
-  --color-bg-tertiary: #f0f4f0;
-  --color-surface-1: #ffffff;
-  --color-surface-2: #fafbfa;
-  --color-surface-3: #f2f5f2;
-  --color-surface-hover: #eef2ee;
+  /* ── Deep Maritime Foundations (Dark Tactical Console) ── */
+  --color-bg-primary: #06090e;      /* Deepest obsidian foundation */
+  --color-bg-secondary: #0a0f19;    /* App workspace shell */
+  --color-bg-tertiary: #0f1728;     /* Inset panels & backgrounds */
+  --color-surface-1: #111a2d;       /* Base card & panel surface */
+  --color-surface-2: #16223b;       /* Elevated cards & active rows */
+  --color-surface-3: #1c2b4a;       /* Secondary inputs & elevated controls */
+  --color-surface-hover: #223358;   /* Interactive hover state */
   
-  /* Remove glassmorphism, replace with solid fallbacks if used */
-  --color-surface-glass: rgba(255, 255, 255, 0.95);
-  --color-surface-glass-hover: rgba(255, 255, 255, 1);
+  --color-surface-glass: rgba(17, 26, 45, 0.92);
+  --color-surface-glass-hover: rgba(22, 34, 59, 0.98);
 
-  /* ── Border Colors ── */
-  --color-border-subtle: rgba(0, 0, 0, 0.05);
-  --color-border-default: rgba(0, 0, 0, 0.08);
-  --color-border-strong: rgba(0, 0, 0, 0.15);
-  --color-border-accent: rgba(132, 155, 135, 0.3);
+  /* ── Structural Hairline Borders ── */
+  --color-border-subtle: rgba(255, 255, 255, 0.07);
+  --color-border-default: rgba(255, 255, 255, 0.12);
+  --color-border-strong: rgba(255, 255, 255, 0.22);
+  --color-border-accent: rgba(6, 182, 212, 0.35);
 
-  /* ── Text Colors ── */
-  --color-text-primary: #2d3732;   /* Dark sage/charcoal */
-  --color-text-secondary: #5e6c64;
-  --color-text-tertiary: #88998f;
-  --color-text-muted: #a3b3a9;
-  --color-text-inverse: #ffffff;
+  /* ── Typography Palette ── */
+  --color-text-primary: #f8fafc;     /* Crisp high-contrast white */
+  --color-text-secondary: #94a3b8;   /* Balanced steel slate */
+  --color-text-tertiary: #64748b;    /* Technical metadata slate */
+  --color-text-muted: #475569;       /* Deep muted annotations */
+  --color-text-inverse: #06090e;     /* High contrast on light chips */
 
-  /* ── Accent Colors ── */
-  --color-accent-primary: #849b87; /* Muted sage green */
-  --color-accent-primary-dim: rgba(132, 155, 135, 0.15);
-  --color-accent-secondary: #a3b8a6;
-  --color-accent-tertiary: #c1d6c4;
-  --color-accent-glow: rgba(132, 155, 135, 0.2);
+  /* ── Strategic Accents ── */
+  --color-accent-primary: #06b6d4;   /* Signal Cyan (Maritime / Telemetry) */
+  --color-accent-primary-dim: rgba(6, 182, 212, 0.12);
+  --color-accent-secondary: #38bdf8; /* Sky telemetry accent */
+  --color-accent-tertiary: #0284c7;  /* Deep maritime blue */
+  --color-accent-gold: #f59e0b;      /* Crude Amber / Spot Price / Alerts */
+  --color-accent-glow: rgba(6, 182, 212, 0.25);
 
-  /* ── Risk Severity Scale ── */
-  /* Softened versions for a human-designed look */
-  --color-risk-low: #7fa183;
-  --color-risk-low-bg: rgba(127, 161, 131, 0.12);
-  --color-risk-moderate: #d6ba73;
-  --color-risk-moderate-bg: rgba(214, 186, 115, 0.12);
-  --color-risk-elevated: #d19a6b;
-  --color-risk-elevated-bg: rgba(209, 154, 107, 0.12);
-  --color-risk-high: #c77b76;
-  --color-risk-high-bg: rgba(199, 123, 118, 0.12);
-  --color-risk-critical: #b8625e;
-  --color-risk-critical-bg: rgba(184, 98, 94, 0.15);
-  --color-risk-critical-glow: rgba(184, 98, 94, 0.3);
+  /* ── Risk Severity Scale (Calibrated High-Contrast Indicators) ── */
+  --color-risk-low: #10b981;
+  --color-risk-low-bg: rgba(16, 185, 129, 0.12);
+  --color-risk-moderate: #06b6d4;
+  --color-risk-moderate-bg: rgba(6, 182, 212, 0.12);
+  --color-risk-elevated: #f59e0b;
+  --color-risk-elevated-bg: rgba(245, 158, 11, 0.12);
+  --color-risk-high: #f97316;
+  --color-risk-high-bg: rgba(249, 115, 22, 0.14);
+  --color-risk-critical: #ef4444;
+  --color-risk-critical-bg: rgba(239, 68, 68, 0.16);
+  --color-risk-critical-glow: rgba(239, 68, 68, 0.35);
 
-  /* ── Status Colors ── */
-  --color-success: #7fa183;
-  --color-success-bg: rgba(127, 161, 131, 0.12);
-  --color-warning: #d6ba73;
-  --color-warning-bg: rgba(214, 186, 115, 0.12);
-  --color-error: #c77b76;
-  --color-error-bg: rgba(199, 123, 118, 0.12);
-  --color-info: #799bb3;
-  --color-info-bg: rgba(121, 155, 179, 0.12);
+  /* ── Operational Status Colors ── */
+  --color-success: #10b981;
+  --color-success-bg: rgba(16, 185, 129, 0.12);
+  --color-warning: #f59e0b;
+  --color-warning-bg: rgba(245, 158, 11, 0.12);
+  --color-error: #ef4444;
+  --color-error-bg: rgba(239, 68, 68, 0.14);
+  --color-info: #06b6d4;
+  --color-info-bg: rgba(6, 182, 212, 0.12);
 
   /* ── Gradients ── */
-  /* Gradients removed - replacing with solid colors as per constraints */
-  --gradient-primary: var(--color-accent-primary);
-  --gradient-risk: var(--color-risk-elevated);
-  --gradient-surface: var(--color-bg-secondary);
-  --gradient-glass: var(--color-surface-glass);
-  --gradient-hero: var(--color-bg-primary);
-  --gradient-accent-border: var(--color-accent-primary);
-  --gradient-danger-border: var(--color-risk-critical);
+  --gradient-primary: linear-gradient(135deg, #06b6d4, #0284c7);
+  --gradient-risk: linear-gradient(135deg, #f59e0b, #ef4444);
+  --gradient-surface: linear-gradient(180deg, rgba(22, 34, 59, 0.6), rgba(17, 26, 45, 0.9));
+  --gradient-glass: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+  --gradient-hero: linear-gradient(180deg, #0a0f19, #06090e);
+  --gradient-accent-border: linear-gradient(90deg, #06b6d4, #38bdf8);
+  --gradient-danger-border: linear-gradient(90deg, #ef4444, #f97316);
 
   /* ── Typography Scale & OpenType ── */
   --font-family-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -120,23 +119,23 @@
   --space-12: 3rem;     /* 48px */
   --space-16: 4rem;     /* 64px */
 
-  /* ── Border Radius (Refined, crisp institutional geometry) ── */
-  --radius-xs: 3px;
+  /* ── Border Radius (Razor-Sharp Tactical Industrial Angles) ── */
+  --radius-xs: 2px;
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
   --radius-xl: 10px;
-  --radius-2xl: 14px;
+  --radius-2xl: 12px;
   --radius-full: 9999px;
 
-  /* ── Shadows (Tactile, restrained elevation) ── */
-  --shadow-sm: 0 1px 2px rgba(45, 55, 50, 0.04);
-  --shadow-md: 0 2px 6px rgba(45, 55, 50, 0.06);
-  --shadow-lg: 0 6px 16px rgba(45, 55, 50, 0.08);
-  --shadow-xl: 0 12px 28px rgba(45, 55, 50, 0.1);
-  --shadow-glow-accent: 0 0 12px var(--color-accent-glow);
-  --shadow-glow-danger: 0 0 12px var(--color-risk-critical-glow);
-  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  /* ── Tactical Elevation Shadows ── */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 16px 36px rgba(0, 0, 0, 0.7);
+  --shadow-glow-accent: 0 0 16px var(--color-accent-glow);
+  --shadow-glow-danger: 0 0 16px var(--color-risk-critical-glow);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 
   /* ── Transitions ── */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -166,13 +165,7 @@
   --bp-desktop: 1440px;
 
   /* ── Focus ── */
-  --focus-ring: 0 0 0 3px rgba(132, 155, 135, 0.4);
-
-  /* ── Glassmorphism (Disabled) ── */
-  --glass-blur: 0px;
-  --glass-blur-heavy: 0px;
-  --glass-bg: var(--color-bg-secondary);
-  --glass-border: 1px solid var(--color-border-default);
+  --focus-ring: 0 0 0 2px var(--color-accent-primary);
 }
 
 /* ── Reset & Base ── */
@@ -190,6 +183,8 @@ html {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   scroll-behavior: smooth;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
 }
 
 body {
@@ -233,6 +228,7 @@ body {
 .text-tertiary { color: var(--color-text-tertiary); }
 .text-muted { color: var(--color-text-muted); }
 .text-accent { color: var(--color-accent-primary); }
+.text-gold { color: var(--color-accent-gold); }
 .text-success { color: var(--color-success); }
 .text-warning { color: var(--color-warning); }
 .text-error { color: var(--color-error); }
@@ -242,106 +238,27 @@ body {
 .tracking-wider { letter-spacing: var(--letter-spacing-wider); }
 .tracking-widest { letter-spacing: var(--letter-spacing-widest); }
 
-.uppercase { text-transform: uppercase; }
-
-/* ── Scrollbar Styling ── */
+/* ── Scrollbar Styling (Dark Precision Hairline) ── */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--color-bg-primary);
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--color-surface-3);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-xs);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-tertiary);
+  background: var(--color-accent-primary);
 }
 
 /* ── Selection ── */
 ::selection {
-  background: var(--color-accent-primary);
-  color: var(--color-text-inverse);
-}
-
-/* ── Animations ── */
-@keyframes pulse-glow {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-@keyframes pulse-ring {
-  0% { transform: scale(1); opacity: 0.8; }
-  100% { transform: scale(2); opacity: 0; }
-}
-
-@keyframes slide-up {
-  from { transform: translateY(10px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes slide-in-right {
-  from { transform: translateX(20px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes flow-dash {
-  to { stroke-dashoffset: -20; }
-}
-
-@keyframes border-flow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-@keyframes count-up {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes critical-pulse {
-  0%, 100% { 
-    box-shadow: 0 0 0 0 var(--color-risk-critical-glow);
-  }
-  50% {
-    box-shadow: 0 0 16px 4px var(--color-risk-critical-glow);
-  }
-}
-
-@keyframes beacon {
-  0% { transform: scale(1); opacity: 0.6; }
-  100% { transform: scale(3); opacity: 0; }
-}
-
-.animate-slide-up {
-  animation: slide-up 0.4s var(--transition-normal) both;
-}
-
-.animate-fade-in {
-  animation: fade-in 0.3s ease both;
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
+  background: rgba(6, 182, 212, 0.3);
+  color: var(--color-text-primary);
 }
