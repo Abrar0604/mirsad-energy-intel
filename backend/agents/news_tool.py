@@ -18,7 +18,7 @@ import logging
 import requests
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from langchain_core.tools import tool
 
 logger = logging.getLogger("mirsad.news")
@@ -26,6 +26,7 @@ logger = logging.getLogger("mirsad.news")
 NEWS_API_KEY = os.getenv("NEWS_API_KEY")
 CACHE_DIR = Path(__file__).parent.parent / "cache"
 CACHE_FILE = CACHE_DIR / "news_cache.json"
+NEWS_CACHE_TTL_SECONDS = 1800  # 30 minutes
 
 
 def _write_cache(query: str, articles: List[Dict[str, Any]]) -> None:
@@ -45,17 +46,20 @@ def _write_cache(query: str, articles: List[Dict[str, Any]]) -> None:
         logger.warning(f"[News] Cache write failed: {e}")
 
 
-def _read_cache() -> List[Dict[str, Any]]:
-    """Read cached news articles if available."""
+def _read_cache(max_age_seconds: Optional[int] = None) -> List[Dict[str, Any]]:
+    """Read cached news articles if available and within optional TTL."""
     try:
         if not CACHE_FILE.exists():
             return []
+        if max_age_seconds is not None:
+            age_seconds = (datetime.utcnow() - datetime.utcfromtimestamp(CACHE_FILE.stat().st_mtime)).total_seconds()
+            if age_seconds > max_age_seconds:
+                return []
         with open(CACHE_FILE, "r") as f:
             data = json.load(f)
         articles = data.get("articles", [])
         if articles:
             logger.info(f"[News] Serving {len(articles)} cached articles from {data.get('timestamp', '?')}")
-            # Mark each article as cached
             for a in articles:
                 a["_cached"] = True
         return articles
@@ -70,9 +74,18 @@ def fetch_geopolitical_news(query: str) -> List[Dict[str, Any]]:
     Fetches recent news articles related to geopolitical events, shipping routes, or oil prices.
     Uses NewsAPI if NEWS_API_KEY is configured. Falls back to cached articles (NOT mock data).
     """
+    # 1. Return fresh cached articles if available (< 30 minutes)
+    fresh_cached = _read_cache(max_age_seconds=NEWS_CACHE_TTL_SECONDS)
+    if fresh_cached:
+        return fresh_cached
+
     if not NEWS_API_KEY:
-        logger.warning("[News] NEWS_API_KEY not found. Trying cache...")
-        cached = _read_cache()
+        logger.warning("[News] NEWS_API_KEY not found. Trying stale cache...")
+        stale = _read_cache(max_age_seconds=None)
+        if stale:
+            return stale
+        logger.error("[News] No API key and no cache. Returning empty.")
+        return []
         if cached:
             return cached
         logger.error("[News] No API key and no cache. Returning empty.")

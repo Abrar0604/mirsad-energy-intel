@@ -183,6 +183,7 @@ class LLMPool:
             temperature=0,
             max_output_tokens=max_tokens,
             convert_system_message_to_human=True,
+            request_timeout=15.0,
             max_retries=0
         )
         messages = []
@@ -196,7 +197,7 @@ class LLMPool:
         """Call OpenAI-compatible API."""
         from openai import OpenAI
 
-        client = OpenAI(api_key=cred.api_key)
+        client = OpenAI(api_key=cred.api_key, timeout=15.0)
         messages = []
         if system:
             messages.append({"role": "system", "content": system})
@@ -215,7 +216,8 @@ class LLMPool:
 
         client = OpenAI(
             api_key=cred.api_key,
-            base_url="https://api.x.ai/v1"
+            base_url="https://api.x.ai/v1",
+            timeout=15.0
         )
         messages = []
         if system:

@@ -17,7 +17,7 @@ import logging
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 logger = logging.getLogger("mirsad.commodity")
 
@@ -31,36 +31,35 @@ def fetch_commodity_prices() -> Dict[str, Any]:
     Fetch current Brent and WTI crude oil prices.
     
     Strategy:
-      1. Try yfinance live fetch
-      2. On success, cache the result to disk
-      3. On failure, serve cached last-good response (if fresh enough)
-      4. If no cache exists, return explicit "unavailable" response
-    
-    Returns:
-        {
-            "brent": { "current_price", "change_1d_pct", ... },
-            "wti": { ... },
-            "brent_wti_spread": float,
-            "source": "yfinance" | "yfinance_cached" | "unavailable",
-            "timestamp": str
-        }
+      1. Check fresh disk cache (< 1 hour TTL)
+      2. If stale or missing, try yfinance live fetch
+      3. On success, update the disk cache
+      4. On failure, serve cached last-good response
+      5. If no cache exists, return explicit "unavailable" response
     """
-    # Try live fetch first
+    # 1. Return fresh cache if available (< 1 hour)
+    cached = _read_cache(max_age_seconds=CACHE_TTL_SECONDS)
+    if cached:
+        cached["source"] = "yfinance_cached"
+        logger.info(f"[Commodity] Serving fresh cached prices from {cached.get('timestamp', '?')}")
+        return cached
+
+    # 2. Try live fetch if cache is stale or missing
     try:
         data = _fetch_live()
         _write_cache(data)
         return data
     except Exception as e:
-        logger.warning(f"[Commodity] yfinance failed: {e}. Trying cache...")
+        logger.warning(f"[Commodity] yfinance live fetch failed: {e}. Trying stale cache...")
 
-    # Fallback to cached data
-    cached = _read_cache()
-    if cached:
-        cached["source"] = "yfinance_cached"
-        logger.info(f"[Commodity] Serving cached prices from {cached.get('timestamp', '?')}")
-        return cached
+    # 3. Fallback to any available cached data
+    stale_cached = _read_cache(max_age_seconds=None)
+    if stale_cached:
+        stale_cached["source"] = "yfinance_cached"
+        logger.info(f"[Commodity] Serving stale cached prices from {stale_cached.get('timestamp', '?')}")
+        return stale_cached
 
-    # No cache available — return unavailable (NOT mock data)
+    # 4. No cache available — return unavailable (NOT mock data)
     logger.error("[Commodity] No live data and no cache. Returning unavailable.")
     return {
         "brent": {"current_price": None, "change_1d_pct": None, "change_7d_pct": None,
@@ -145,16 +144,17 @@ def _write_cache(data: Dict[str, Any]) -> None:
         logger.warning(f"[Commodity] Cache write failed: {e}")
 
 
-def _read_cache() -> Dict[str, Any] | None:
-    """Read cached commodity data if it exists and is within TTL."""
+def _read_cache(max_age_seconds: Optional[int] = None) -> Dict[str, Any] | None:
+    """Read cached commodity data if it exists and matches optional max_age_seconds."""
     try:
         if not CACHE_FILE.exists():
             return None
 
-        # Check file age
-        age_seconds = (datetime.utcnow() - datetime.utcfromtimestamp(CACHE_FILE.stat().st_mtime)).total_seconds()
-        if age_seconds > CACHE_TTL_SECONDS * 6:  # Allow up to 6x TTL for fallback (6 hours)
-            logger.warning(f"[Commodity] Cache is {age_seconds/3600:.1f}h old — stale but usable as fallback.")
+        # Check file age if max_age_seconds is specified
+        if max_age_seconds is not None:
+            age_seconds = (datetime.utcnow() - datetime.utcfromtimestamp(CACHE_FILE.stat().st_mtime)).total_seconds()
+            if age_seconds > max_age_seconds:
+                return None
 
         with open(CACHE_FILE, "r") as f:
             return json.load(f)

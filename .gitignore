@@ -24,3 +24,4 @@ package-lock.json
 backend/logs/
 backend/chroma_db/
 backend/cache/
+thinking.txt

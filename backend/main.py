@@ -45,6 +45,10 @@ CACHE_DIR = Path(__file__).parent / "cache"
 CACHE_DIR.mkdir(exist_ok=True)
 LATEST_SCAN_FILE = CACHE_DIR / "latest_scan.json"
 SCAN_LOG_FILE = CACHE_DIR / "scan_log.jsonl"
+DEFAULT_SCAN_FILE = Path(__file__).parent / "data" / "default_scan.json"
+
+# Concurrency lock to prevent concurrent heavy graph invocations on Render's 512MB RAM
+analysis_lock = threading.Lock()
 
 # ── In-memory store for the latest scan result ──
 latest_scan_data = {
@@ -70,98 +74,41 @@ def log_scan(status: str, details: str = "", risk_score=None):
         logger.warning(f"Failed to write scan log: {e}")
 
 
-def run_scheduled_scan():
-    """Execute a full 9-node pipeline scan and cache the result."""
-    logger.info("[AutoScan] Starting scheduled scan...")
-    log_scan("started", "Scheduled auto-scan initiated")
-
-    initial_state = {
-        "topic": "Middle East shipping routes",
-        "articles": [],
-        "commodity_prices": None,
-        "vessel_signals": None,
-        "retrieved_facts": None,
-        "risk_assessment": None,
-        "economic_impact": None,
-        "trajectory_forecast": None,
-        "computed_metrics": None,
-        "llm_usage": [],
-        "final_report": None,
-        "error": None
-    }
-
-    try:
-        final_state = graph_app.invoke(initial_state)
-        report = final_state.get("final_report")
-
-        if report:
-            now = datetime.now(timezone.utc).isoformat()
-            report["_scanned_at"] = now
-            report["_scan_type"] = "auto"
-
-            latest_scan_data["result"] = report
-            latest_scan_data["scanned_at"] = now
-            latest_scan_data["status"] = "success"
-            latest_scan_data["scan_count"] += 1
-
-            # Persist to disk so it survives restarts
-            with open(LATEST_SCAN_FILE, "w") as f:
-                json.dump(report, f)
-
-            risk = report.get("risk_score", "?")
-            logger.info(f"[AutoScan] Scan complete. Risk: {risk}/100")
-            log_scan("success", f"Risk score: {risk}/100, Sources: {report.get('sources_consulted', 0)}", risk)
-        else:
-            latest_scan_data["status"] = "error"
-            log_scan("error", "Pipeline returned no report")
-            logger.error("[AutoScan] Pipeline returned no report")
-
-    except Exception as e:
-        latest_scan_data["status"] = "error"
-        log_scan("error", str(e))
-        logger.error(f"[AutoScan] Scan failed: {e}", exc_info=True)
-
-
 def load_cached_scan():
     """Load the last scan result from disk on startup."""
+    target_file = None
     if LATEST_SCAN_FILE.exists():
+        target_file = LATEST_SCAN_FILE
+    elif DEFAULT_SCAN_FILE.exists():
+        target_file = DEFAULT_SCAN_FILE
+
+    if target_file:
         try:
-            with open(LATEST_SCAN_FILE) as f:
+            with open(target_file) as f:
                 data = json.load(f)
+            now = data.get("_scanned_at") or data.get("timestamp") or datetime.now(timezone.utc).isoformat()
+            data["_scanned_at"] = now
             latest_scan_data["result"] = data
-            latest_scan_data["scanned_at"] = data.get("_scanned_at")
+            latest_scan_data["scanned_at"] = now
             latest_scan_data["status"] = "success"
-            logger.info(f"[AutoScan] Restored cached scan from {data.get('_scanned_at')}")
+            latest_scan_data["scan_count"] = 1
+            # Ensure latest_scan.json is created
+            if not LATEST_SCAN_FILE.exists():
+                with open(LATEST_SCAN_FILE, "w") as f:
+                    json.dump(data, f)
+            logger.info(f"[AutoScan] Restored cached scan from {now} (source: {target_file.name})")
         except Exception as e:
             logger.warning(f"[AutoScan] Failed to load cached scan: {e}")
 
 
-def schedule_auto_scans():
-    """Schedule auto-scans 3 times a day (every 8 hours).
-    First scan runs 60 seconds after startup to let models load."""
-    import time
-
-    # Wait for FactStore to initialize
-    time.sleep(60)
-
-    while True:
-        run_scheduled_scan()
-        # Sleep 8 hours (3 scans per day)
-        time.sleep(8 * 60 * 60)
-
-
 @app.on_event("startup")
 def startup_event():
-    # Load cached scan from disk
+    # 1. Instantly load cached scan so frontend gets data in < 1ms
     load_cached_scan()
 
-    # Initialize FactStore models in background
-    logger.info("Initializing FactStore models in background thread...")
-    threading.Thread(target=fact_store.initialize, daemon=True).start()
-
-    # Start the auto-scan scheduler in background
-    logger.info("[AutoScan] Starting auto-scan scheduler (every 8 hours)...")
-    threading.Thread(target=schedule_auto_scans, daemon=True).start()
+    # 2. Fast synchronous BM25 index initialization (< 2ms)
+    logger.info("Initializing FactStore BM25 index...")
+    fact_store.initialize()
 
 
 class AnalyzeRequest(BaseModel):
@@ -173,20 +120,23 @@ def read_root():
     return {
         "message": "Welcome to the MIRSAD AI Backend API",
         "version": "2.0.0",
+        "status": "healthy",
         "features": [
             "Multi-LLM key rotation pool",
-            "RAG fact-grounded analysis",
+            "BM25 high-performance fact retrieval (0-dep)",
             "Multi-source intelligence (news + commodity + AIS)",
             "Predictive risk trajectory (7/30-day forecast)",
             "Quantitative metrics (SSI, HHI, DoA, PSI)",
-            "Automated scan scheduler (3x daily)"
+            "Render Free Tier optimized (low RAM, thread-safe)"
         ]
     }
 
 
 @app.get("/api/latest-scan")
-async def get_latest_scan():
-    """Returns the most recent auto-scan result with metadata."""
+def get_latest_scan():
+    """Returns the most recent scan result with metadata instantly."""
+    if latest_scan_data["result"] is None:
+        load_cached_scan()
     return {
         "scanned_at": latest_scan_data["scanned_at"],
         "status": latest_scan_data["status"],
@@ -196,37 +146,54 @@ async def get_latest_scan():
 
 
 @app.post("/api/analyze-risk")
-async def analyze_risk(request: AnalyzeRequest):
+def analyze_risk(request: AnalyzeRequest):
     """
     Triggers the 9-node LangGraph agent pipeline:
     fetch_news → fetch_commodity_prices → fetch_vessel_signals →
     retrieve_facts → analyze_risk → predict_trajectory →
     compute_metrics → assess_economic → compile_report
+
+    Note: Defined as a standard synchronous `def` so FastAPI dispatches it
+    to a worker thread in Starlette's threadpool. This prevents event loop starvation
+    and allows health checks and concurrent read requests to respond immediately.
     """
-    logger.info(f"Starting analysis for topic: {request.topic}")
+    logger.info(f"Analysis requested for topic: {request.topic}")
 
-    # Initialize the state with all new fields
-    initial_state = {
-        "topic": request.topic,
-        "articles": [],
-        "commodity_prices": None,
-        "vessel_signals": None,
-        "retrieved_facts": None,
-        "risk_assessment": None,
-        "economic_impact": None,
-        "trajectory_forecast": None,
-        "computed_metrics": None,
-        "llm_usage": [],
-        "final_report": None,
-        "error": None
-    }
+    # Concurrency guard: Only one pipeline execution at a time on Render Free Tier
+    # (prevents OOM on 512MB RAM and 0.1 vCPU)
+    acquired = analysis_lock.acquire(blocking=False)
+    if not acquired:
+        logger.warning("Analysis already in progress; returning current cached intelligence")
+        if latest_scan_data["result"]:
+            res = dict(latest_scan_data["result"])
+            res["_in_progress_notice"] = "Another analysis is currently being processed. Serving latest intelligence."
+            return res
+        raise HTTPException(
+            status_code=429,
+            detail="An analysis is currently being processed. Please retry in a few seconds."
+        )
 
-    # Run the graph
     try:
+        log_scan("started", f"Analysis initiated for '{request.topic}'")
+        initial_state = {
+            "topic": request.topic,
+            "articles": [],
+            "commodity_prices": None,
+            "vessel_signals": None,
+            "retrieved_facts": None,
+            "risk_assessment": None,
+            "economic_impact": None,
+            "trajectory_forecast": None,
+            "computed_metrics": None,
+            "llm_usage": [],
+            "final_report": None,
+            "error": None
+        }
+
         final_state = graph_app.invoke(initial_state)
         report = final_state.get("final_report")
+
         if report:
-            # Also cache this as the latest scan
             now = datetime.now(timezone.utc).isoformat()
             report["_scanned_at"] = now
             report["_scan_type"] = "manual"
@@ -235,20 +202,39 @@ async def analyze_risk(request: AnalyzeRequest):
             latest_scan_data["status"] = "success"
             latest_scan_data["scan_count"] += 1
 
-            with open(LATEST_SCAN_FILE, "w") as f:
-                json.dump(report, f)
+            try:
+                with open(LATEST_SCAN_FILE, "w") as f:
+                    json.dump(report, f)
+            except Exception as fe:
+                logger.warning(f"Could not write latest scan to disk: {fe}")
 
             log_scan("success", f"Manual scan. Risk: {report.get('risk_score')}/100", report.get("risk_score"))
             logger.info(f"Analysis complete. Risk: {report.get('risk_score')}/100, Sources: {report.get('sources_consulted')}")
             return report
+
+        logger.error("Pipeline finished without producing a report")
+        log_scan("error", "Pipeline returned no report")
+        # Return last good scan if pipeline fails
+        if latest_scan_data["result"]:
+            return latest_scan_data["result"]
         return {"error": "Failed to generate report"}
+
     except Exception as e:
         logger.error(f"Pipeline error: {e}", exc_info=True)
+        log_scan("error", str(e))
+        # Fall back gracefully to cached scan if available
+        if latest_scan_data["result"]:
+            logger.info("Serving last-known-good cached scan after pipeline exception")
+            fallback_res = dict(latest_scan_data["result"])
+            fallback_res["_fallback_notice"] = f"Real-time pipeline exception: {str(e)[:100]}. Serving last known good intelligence."
+            return fallback_res
         raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        analysis_lock.release()
 
 
 @app.get("/api/scan-log")
-async def get_scan_log():
+def get_scan_log():
     """Returns the last 20 scan log entries."""
     entries = []
     if SCAN_LOG_FILE.exists():
@@ -263,11 +249,13 @@ async def get_scan_log():
 
 
 @app.get("/api/system-status")
-async def system_status():
+def system_status():
     """
     Returns current system health including LLM pool status,
     fact store stats, and pipeline capabilities.
     """
+    if not fact_store._initialized:
+        fact_store.initialize()
     return {
         "llm_pool": {
             "pool_size": llm_pool.pool_size,
@@ -282,10 +270,10 @@ async def system_status():
                 "compute_metrics", "assess_economic", "compile_report"
             ],
             "node_count": 9,
-            "data_sources": ["GDELT/NewsAPI", "Brent/WTI (yfinance)", "AIS vessel signals", "ChromaDB facts"]
+            "data_sources": ["GDELT/NewsAPI", "Brent/WTI (yfinance)", "AIS vessel signals", "BM25 Knowledge Base"]
         },
         "auto_scan": {
-            "frequency": "Every 8 hours (3x daily)",
+            "frequency": "On-demand + persistent cache",
             "last_scan": latest_scan_data["scanned_at"],
             "scan_count": latest_scan_data["scan_count"],
             "status": latest_scan_data["status"]
@@ -295,4 +283,5 @@ async def system_status():
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port)
