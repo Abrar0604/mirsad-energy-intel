@@ -12,16 +12,16 @@ class ChartManager {
       plugins: {
         legend: {
           labels: {
-            color: '#9ba3b5',
+            color: '#475569',
             font: { family: "'Inter', sans-serif", size: 11 },
             padding: 12
           }
         },
         tooltip: {
-          backgroundColor: 'rgba(19, 24, 41, 0.95)',
-          titleColor: '#e8eaf0',
-          bodyColor: '#9ba3b5',
-          borderColor: 'rgba(255,255,255,0.1)',
+          backgroundColor: '#ffffff',
+          titleColor: '#0f172a',
+          bodyColor: '#475569',
+          borderColor: '#e2e8f0',
           borderWidth: 1,
           padding: 10,
           cornerRadius: 6,
@@ -31,14 +31,14 @@ class ChartManager {
       },
       scales: {
         x: {
-          ticks: { color: '#6b7280', font: { family: "'Inter', sans-serif", size: 10 } },
-          grid: { color: 'rgba(255,255,255,0.04)' },
-          border: { color: 'rgba(255,255,255,0.08)' }
+          ticks: { color: '#64748b', font: { family: "'Inter', sans-serif", size: 10 } },
+          grid: { color: 'rgba(15, 23, 42, 0.05)' },
+          border: { color: '#cbd5e1' }
         },
         y: {
-          ticks: { color: '#6b7280', font: { family: "'JetBrains Mono', monospace", size: 10 } },
-          grid: { color: 'rgba(255,255,255,0.04)' },
-          border: { color: 'rgba(255,255,255,0.08)' }
+          ticks: { color: '#64748b', font: { family: "'JetBrains Mono', monospace", size: 10 } },
+          grid: { color: 'rgba(15, 23, 42, 0.05)' },
+          border: { color: '#cbd5e1' }
         }
       }
     };
@@ -112,7 +112,7 @@ class ChartManager {
         datasets: [{
           data: suppliers.map(s => s.india_import_share),
           backgroundColor: colors.slice(0, suppliers.length),
-          borderColor: '#111a2d',
+          borderColor: '#ffffff',
           borderWidth: 2,
           hoverOffset: 8
         }]
@@ -125,7 +125,7 @@ class ChartManager {
           legend: {
             position: 'right',
             labels: {
-              color: '#9ba3b5',
+              color: '#475569',
               font: { family: "'Inter', sans-serif", size: 10 },
               padding: 8,
               usePointStyle: true,
@@ -322,14 +322,14 @@ class ChartManager {
           y: {
             ...this.defaultOptions.scales.y,
             position: 'left',
-            title: { display: true, text: 'Stock (MMT)', color: '#6b7280', font: { size: 10 } }
+            title: { display: true, text: 'Stock (MMT)', color: '#64748b', font: { size: 10 } }
           },
           y2: {
             position: 'right',
-            ticks: { color: '#6b7280', font: { family: "'JetBrains Mono', monospace", size: 10 } },
+            ticks: { color: '#64748b', font: { family: "'JetBrains Mono', monospace", size: 10 } },
             grid: { drawOnChartArea: false },
-            border: { color: 'rgba(255,255,255,0.08)' },
-            title: { display: true, text: 'Release (K bpd)', color: '#6b7280', font: { size: 10 } }
+            border: { color: '#cbd5e1' },
+            title: { display: true, text: 'Release (K bpd)', color: '#64748b', font: { size: 10 } }
           }
         }
       }
@@ -390,7 +390,7 @@ class ChartManager {
           x: {
             ...this.defaultOptions.scales.x,
             max: 100,
-            title: { display: true, text: 'Utilization %', color: '#6b7280', font: { size: 10 } }
+            title: { display: true, text: 'Utilization %', color: '#64748b', font: { size: 10 } }
           },
           y: {
             ...this.defaultOptions.scales.y,

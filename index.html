@@ -20,11 +20,11 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/design-system.css?v=15">
-  <link rel="stylesheet" href="css/layout.css?v=15">
-  <link rel="stylesheet" href="css/components.css?v=15">
-  <link rel="stylesheet" href="css/dashboard.css?v=15">
-  <link rel="stylesheet" href="css/map.css?v=15">
+  <link rel="stylesheet" href="css/design-system.css?v=16">
+  <link rel="stylesheet" href="css/layout.css?v=16">
+  <link rel="stylesheet" href="css/components.css?v=16">
+  <link rel="stylesheet" href="css/dashboard.css?v=16">
+  <link rel="stylesheet" href="css/map.css?v=16">
 </head>
 <body>
 
@@ -142,8 +142,9 @@
           <!-- Sidebar Tabs Navigation -->
           <div class="sidebar-tabs">
             <button class="sidebar-tab active" data-sidebar-tab="overview"><i data-lucide="target"></i> Overview</button>
+            <button class="sidebar-tab" data-sidebar-tab="inspector"><i data-lucide="crosshair"></i> Inspector</button>
             <button class="sidebar-tab" data-sidebar-tab="alerts"><i data-lucide="siren"></i> Alerts</button>
-            <button class="sidebar-tab" data-sidebar-tab="corridors"><i data-lucide="route"></i> Corridors & Audit</button>
+            <button class="sidebar-tab" data-sidebar-tab="corridors"><i data-lucide="route"></i> Corridors</button>
           </div>
 
           <!-- Tab 1: Overview -->
@@ -151,6 +152,23 @@
             <div class="sidebar-section" style="text-align: center; padding: var(--space-3) var(--space-4);">
               <div class="sidebar-section__title"><i data-lucide="target"></i> MIRSAD RISK INDEX</div>
               <div id="risk-gauge-container" style="display: flex; justify-content: center; margin: var(--space-2) 0;"></div>
+              
+              <!-- Plain English Explainable Risk Breakdown -->
+              <div class="explain-risk-card">
+                <div class="explain-risk-card__header"><i data-lucide="help-circle"></i> Why Risk is Elevated (77/100)</div>
+                <div class="explain-risk-item">
+                  <span class="explain-risk-item__pill explain-risk-item__pill--critical">Hormuz</span>
+                  <span><strong>55% of India crude</strong> transits Hormuz. High naval standoff & insurance surcharge risks.</span>
+                </div>
+                <div class="explain-risk-item">
+                  <span class="explain-risk-item__pill explain-risk-item__pill--high">Red Sea</span>
+                  <span>Bab-el-Mandeb threat forces Cape rerouting (+14 transit days, +$3.2M freight per VLCC).</span>
+                </div>
+                <div class="explain-risk-item">
+                  <span class="explain-risk-item__pill explain-risk-item__pill--moderate">Buffers</span>
+                  <span>9.5 days SPR stock + 64 days commercial stocks provide a strategic shock absorber.</span>
+                </div>
+              </div>
             </div>
 
             <div class="sidebar-section">
@@ -163,6 +181,33 @@
             <div class="sidebar-section">
               <div class="sidebar-section__title"><i data-lucide="bot"></i> Active Agents</div>
               <div id="agent-statuses" style="display: flex; flex-direction: column; gap: var(--space-2);"></div>
+            </div>
+          </div>
+
+          <!-- Tab: Artifact Telemetry Inspector -->
+          <div class="sidebar-tab-panel" id="sb-panel-inspector">
+            <div class="sidebar-section" id="inspector-content">
+              <!-- Empty State -->
+              <div class="inspector-empty-state" id="inspector-empty">
+                <div class="empty-state-icon"><i data-lucide="crosshair"></i></div>
+                <h4 style="margin: 0 0 6px 0; font-size: 13px; font-weight: 700; color: var(--color-text-primary);">Artifact Telemetry Inspector</h4>
+                <p style="font-size: 11px; color: var(--color-text-secondary); line-height: 1.45; margin: 0 0 14px 0;">
+                  Click any corridor, refinery, chokepoint, vessel, or SPR site on the map to inspect live operational telemetry, threat diagnostics, and mitigation pathways.
+                </p>
+                <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-tertiary); margin-bottom: 8px;">
+                  Quick Artifact Presets
+                </div>
+                <div class="inspector-quick-chips">
+                  <button class="quick-chip" onclick="window.app?.selectQuickArtifact('chokepoint', 'hormuz')"><i data-lucide="alert-triangle"></i> Strait of Hormuz (Critical)</button>
+                  <button class="quick-chip" onclick="window.app?.selectQuickArtifact('chokepoint', 'bab-el-mandeb')"><i data-lucide="alert-triangle"></i> Bab-el-Mandeb (Critical)</button>
+                  <button class="quick-chip" onclick="window.app?.selectQuickArtifact('route', 'hormuz-jamnagar')"><i data-lucide="ship"></i> Persian Gulf → Jamnagar Route</button>
+                  <button class="quick-chip" onclick="window.app?.selectQuickArtifact('refinery', 'ref-ril-jam')"><i data-lucide="factory"></i> Jamnagar Refinery DTA (33 MMTPA)</button>
+                  <button class="quick-chip" onclick="window.app?.selectQuickArtifact('spr', 'spr-vizag')"><i data-lucide="database"></i> Visakhapatnam SPR (86.5% Fill)</button>
+                </div>
+              </div>
+
+              <!-- Filled State -->
+              <div class="inspector-details" id="inspector-details" style="display: none;"></div>
             </div>
           </div>
 
@@ -460,7 +505,7 @@
 </div>
 
 <!-- Main App Script -->
-<script type="module" src="js/app.js?v=15"></script>
+<script type="module" src="js/app.js?v=16"></script>
 
 </body>
 </html>

@@ -44,16 +44,16 @@ class MapEngine {
       attributionControl: true
     });
 
-    // High-performance Dark Gray Canvas basemap (free, reliable, zero watermarks)
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+    // High-performance Light Gray Canvas basemap (free, reliable, zero watermarks)
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
       attribution: '© <a href="https://www.esri.com">Esri</a> · USGS, NOAA',
       maxZoom: 16
     }).addTo(this.map);
 
-    // Subtle dark labels overlay
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+    // Subtle light labels overlay
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 16,
-      opacity: 0.65
+      opacity: 0.75
     }).addTo(this.map);
 
     // Add zoom control to top right
@@ -110,10 +110,19 @@ class MapEngine {
       const onHover = () => routeLine.setStyle({ weight: 5, opacity: 1 });
       const onOut = () => routeLine.setStyle({ weight: 3, opacity: 0.8 });
 
+      const onSelect = () => {
+        if (window.app && typeof window.app.inspectArtifact === 'function') {
+          window.app.inspectArtifact('route', route);
+        }
+      };
+
       routeLine.on('mouseover', onHover);
       routeLine.on('mouseout', onOut);
+      routeLine.on('click', onSelect);
+
       hitBuffer.on('mouseover', onHover);
       hitBuffer.on('mouseout', onOut);
+      hitBuffer.on('click', onSelect);
 
       this.layers.routes.addLayer(routeLine);
       this.layers.routes.addLayer(hitBuffer);
@@ -163,6 +172,11 @@ class MapEngine {
       );
 
       marker.bindPopup(this.createRefineryPopup(refinery));
+      marker.on('click', () => {
+        if (window.app && typeof window.app.inspectArtifact === 'function') {
+          window.app.inspectArtifact('refinery', refinery);
+        }
+      });
       this.layers.refineries.addLayer(marker);
     });
   }
@@ -188,6 +202,11 @@ class MapEngine {
       );
 
       marker.bindPopup(this.createChokepointPopup(cp));
+      marker.on('click', () => {
+        if (window.app && typeof window.app.inspectArtifact === 'function') {
+          window.app.inspectArtifact('chokepoint', cp);
+        }
+      });
       this.layers.chokepoints.addLayer(marker);
     });
   }
@@ -213,6 +232,11 @@ class MapEngine {
       );
 
       marker.bindPopup(this.createVesselPopup(vessel));
+      marker.on('click', () => {
+        if (window.app && typeof window.app.inspectArtifact === 'function') {
+          window.app.inspectArtifact('vessel', vessel);
+        }
+      });
       this.layers.vessels.addLayer(marker);
     });
   }
@@ -237,6 +261,11 @@ class MapEngine {
       );
 
       marker.bindPopup(this.createSPRPopup(site));
+      marker.on('click', () => {
+        if (window.app && typeof window.app.inspectArtifact === 'function') {
+          window.app.inspectArtifact('spr', site);
+        }
+      });
       this.layers.sprSites.addLayer(marker);
     });
   }
@@ -487,6 +516,13 @@ class MapEngine {
     }
   }
 
+  // Focus map on arbitrary coordinates
+  focusOn(lat, lng, zoom = 6) {
+    if (this.map) {
+      this.map.flyTo([lat, lng], zoom, { duration: 1.2 });
+    }
+  }
+
   // Update route colors based on risk scores
   updateRouteRisks(corridorRisks) {
     if (!this.layers.routes) return;
@@ -511,11 +547,11 @@ class MapEngine {
   }
 
   getRiskColor(score) {
-    if (score >= 80) return '#dc2626';
-    if (score >= 65) return '#ef4444';
-    if (score >= 45) return '#f97316';
-    if (score >= 25) return '#eab308';
-    return '#22c55e';
+    if (score >= 80) return '#be123c'; // Critical Rose
+    if (score >= 65) return '#c2410c'; // High Orange
+    if (score >= 45) return '#b45309'; // Warning Amber
+    if (score >= 25) return '#0284c7'; // Moderate Sky
+    return '#15803d'; // Low Green
   }
 
   resize() {

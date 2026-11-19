@@ -49,7 +49,8 @@ header {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, rgba(6, 182, 212, 0.4) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(245, 158, 11, 0.4) 100%);
+  background: linear-gradient(90deg, #38bdf8 0%, #cbd5e1 50%, #f59e0b 100%);
+  opacity: 0.6;
 }
 
 .top-bar__brand {
@@ -63,21 +64,21 @@ header {
 .top-bar__logo {
   width: 32px;
   height: 32px;
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border-accent);
-  color: var(--color-accent-primary);
+  background: #e0f2fe;
+  border: 1px solid #bae6fd;
+  color: #0284c7;
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: var(--font-size-md);
-  box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+  box-shadow: 0 1px 3px rgba(2, 132, 199, 0.15);
 }
 
 .top-bar__title {
   font-size: 15px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: -0.01em;
   color: var(--color-text-primary);
   display: flex;
   align-items: baseline;
@@ -86,9 +87,9 @@ header {
 
 .top-bar__title-ar {
   font-size: 12px;
-  font-weight: 400;
-  color: var(--color-accent-gold);
-  opacity: 0.85;
+  font-weight: 500;
+  color: #0284c7;
+  opacity: 0.9;
 }
 
 .top-bar__subtitle {
@@ -104,7 +105,7 @@ header {
 .top-bar__nav {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   height: 100%;
   flex: 0 0 auto;
   min-width: 0;
@@ -119,9 +120,9 @@ header {
 .nav-tab {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 0 10px;
-  height: 100%;
+  gap: 6px;
+  padding: 6px 11px;
+  height: 32px;
   border: none;
   background: transparent;
   color: var(--color-text-secondary);
@@ -131,16 +132,18 @@ header {
   cursor: pointer;
   transition: all var(--transition-fast);
   position: relative;
+  border-radius: var(--radius-sm);
   white-space: nowrap;
 }
 
 .nav-tab:hover {
   color: var(--color-text-primary);
-  background: var(--color-surface-hover);
+  background: #f1f5f9;
 }
 
 .nav-tab.active {
-  color: var(--color-accent-primary);
+  color: #0284c7;
+  background: #e0f2fe;
   font-weight: 600;
 }
 
@@ -148,11 +151,11 @@ header {
   content: '';
   position: absolute;
   bottom: 0;
-  left: var(--space-3);
-  right: var(--space-3);
+  left: 10px;
+  right: 10px;
   height: 2px;
-  background: var(--color-accent-primary);
-  box-shadow: 0 0 8px var(--color-accent-primary);
+  background: #0284c7;
+  border-radius: 2px;
 }
 
 .nav-tab__icon {
@@ -221,11 +224,11 @@ header {
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  background: var(--color-surface-2);
+  background: #f1f5f9;
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-sm);
   font-size: 11px;
-  color: var(--color-text-tertiary);
+  color: var(--color-text-secondary);
   font-family: var(--font-family-mono);
   font-variant-numeric: tabular-nums;
 }
@@ -233,33 +236,33 @@ header {
 .last-scan-badge i {
   width: 13px;
   height: 13px;
-  color: var(--color-text-secondary);
+  color: var(--color-text-tertiary);
 }
 
-/* ── Tactical Live Scan Button ── */
+/* ── Tactical Live Scan Button (Light Pastel Accent) ── */
 .btn-scan-trigger {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 11px;
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(2, 132, 199, 0.25));
-  border: 1px solid rgba(56, 189, 248, 0.4);
+  padding: 5px 12px;
+  background: #0284c7;
+  border: 1px solid #0369a1;
   border-radius: var(--radius-sm);
-  color: #38bdf8;
+  color: #ffffff;
   font-family: var(--font-family-ui);
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   cursor: pointer;
   transition: all var(--transition-fast);
   white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(2, 132, 199, 0.25);
 }
 
 .btn-scan-trigger:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.3), rgba(2, 132, 199, 0.45));
-  border-color: #38bdf8;
+  background: #0369a1;
   color: #ffffff;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+  box-shadow: 0 4px 10px rgba(2, 132, 199, 0.35);
 }
 
 .btn-scan-trigger:disabled {
@@ -408,7 +411,7 @@ header {
 /* ── Command Center Layout ── */
 .command-center {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-columns: minmax(0, 1fr) 390px;
   grid-template-rows: 1fr;
   gap: 0;
   height: 100%;
@@ -438,11 +441,13 @@ header {
   min-height: 0;
 }
 
-/* ── Sidebar Tabs ── */
+/* ── Sidebar Tabs (Modern Soft Segmented Pill Bar) ── */
 .sidebar-tabs {
   display: flex;
-  background: var(--color-bg-tertiary);
+  background: #f1f5f9;
   border-bottom: 1px solid var(--color-border-subtle);
+  padding: 4px;
+  gap: 3px;
   flex-shrink: 0;
 }
 
@@ -452,13 +457,13 @@ header {
   align-items: center;
   justify-content: center;
   gap: 5px;
-  padding: 10px 4px;
+  padding: 7px 5px;
   font-size: 11px;
   font-weight: 500;
-  color: var(--color-text-tertiary);
+  color: var(--color-text-secondary);
   background: transparent;
   border: none;
-  border-bottom: 2px solid transparent;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all var(--transition-fast);
   white-space: nowrap;
@@ -466,14 +471,14 @@ header {
 
 .sidebar-tab:hover {
   color: var(--color-text-primary);
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.7);
 }
 
 .sidebar-tab.active {
-  color: var(--color-accent-primary);
-  background: var(--color-surface-1);
-  border-bottom-color: var(--color-accent-primary);
+  color: #0284c7;
+  background: #ffffff;
   font-weight: 600;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
 }
 
 .sidebar-tab-panel {
@@ -656,6 +661,262 @@ header {
   .reserves-view {
     grid-template-columns: 1fr;
   }
+}
+
+/* ── Artifact Telemetry Inspector Styles ── */
+.inspector-empty-state {
+  text-align: center;
+  padding: var(--space-4) var(--space-3);
+  background: #f8fafc;
+  border: 1px dashed var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-3);
+}
+
+.inspector-empty-state .empty-state-icon {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto var(--space-3) auto;
+  border-radius: 50%;
+  background: #e0f2fe;
+  color: #0284c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inspector-empty-state .empty-state-icon i {
+  width: 22px;
+  height: 22px;
+}
+
+.inspector-quick-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.quick-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition: all var(--transition-fast);
+}
+
+.quick-chip:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #0284c7;
+  transform: translateX(2px);
+}
+
+.quick-chip i {
+  width: 14px;
+  height: 14px;
+  color: #0284c7;
+  flex-shrink: 0;
+}
+
+.inspector-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  animation: fade-in 0.2s ease;
+}
+
+.inspector-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.inspector-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.inspector-badge--critical {
+  background: #ffe4e6;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+}
+
+.inspector-badge--high {
+  background: #ffedd5;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
+.inspector-badge--moderate {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.inspector-badge--low {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+.inspector-title {
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.inspector-subtitle {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+.inspector-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.inspector-tile {
+  background: #f8fafc;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.inspector-tile__label {
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.inspector-tile__value {
+  font-family: var(--font-family-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.inspector-narrative {
+  background: #ffffff;
+  border: 1px solid var(--color-border-subtle);
+  border-left: 3px solid #0284c7;
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+}
+
+.inspector-narrative strong {
+  color: var(--color-text-primary);
+}
+
+.inspector-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.inspector-actions .btn {
+  flex: 1;
+  justify-content: center;
+}
+
+/* ── Explainable Risk Analysis Card (Overview Tab) ── */
+.explain-risk-card {
+  background: #ffffff;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin-top: var(--space-3);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.explain-risk-card__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.explain-risk-card__header i {
+  width: 14px;
+  height: 14px;
+  color: #c2410c;
+}
+
+.explain-risk-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--color-border-subtle);
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.explain-risk-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.explain-risk-item__pill {
+  flex-shrink: 0;
+  font-family: var(--font-family-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+
+.explain-risk-item__pill--critical {
+  background: #ffe4e6;
+  color: #be123c;
+}
+
+.explain-risk-item__pill--high {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.explain-risk-item__pill--moderate {
+  background: #e0f2fe;
+  color: #0369a1;
 }
 
 /* ── Animations ── */

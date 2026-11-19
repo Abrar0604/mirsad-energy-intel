@@ -4,11 +4,12 @@
 // ============================================================
 
 import { AgentCoordinator } from './agents/agent-coordinator.js';
-import { MapEngine } from './visualization/map-engine.js?v=15';
-import { ChartManager } from './visualization/charts.js?v=15';
+import { MapEngine } from './visualization/map-engine.js?v=16';
+import { ChartManager } from './visualization/charts.js?v=16';
 import { AnimationManager } from './visualization/animations.js';
 import { GEOPOLITICAL_EVENTS, EVENT_ICONS } from './data/geopolitical-events.js';
-import { SUPPLY_ROUTES } from './data/supply-routes.js';
+import { SUPPLY_ROUTES, CHOKEPOINTS, SIMULATED_VESSELS } from './data/supply-routes.js';
+import { REFINERIES } from './data/refineries.js';
 import { SUPPLIERS, IMPORT_STATS } from './data/suppliers.js';
 import { SCENARIOS } from './data/scenarios.js';
 import { SPR_SITES, SPR_STATS, DRAWDOWN_STRATEGIES } from './data/spr-data.js';
@@ -151,6 +152,212 @@ class MirsadApp {
         if (targetPanel) targetPanel.classList.add('active');
       });
     });
+  }
+
+  // ── Artifact Telemetry Inspector Methods ──
+  inspectArtifact(type, data) {
+    if (!data) return;
+
+    // 1. Activate the Inspector sidebar tab
+    const inspectorTab = document.querySelector('.sidebar-tab[data-sidebar-tab="inspector"]');
+    if (inspectorTab) {
+      document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+      inspectorTab.classList.add('active');
+
+      document.querySelectorAll('.sidebar-tab-panel').forEach(p => p.classList.remove('active'));
+      const inspectorPanel = document.getElementById('sb-panel-inspector');
+      if (inspectorPanel) inspectorPanel.classList.add('active');
+    }
+
+    const emptyState = document.getElementById('inspector-empty');
+    const detailsContainer = document.getElementById('inspector-details');
+    if (!detailsContainer) return;
+
+    if (emptyState) emptyState.style.display = 'none';
+    detailsContainer.style.display = 'block';
+
+    let badgeClass = 'inspector-badge--moderate';
+    let badgeText = type.toUpperCase();
+    let title = data.name || 'Artifact';
+    let subtitle = '';
+    let tiles = [];
+    let narrative = '';
+    let actionsHtml = '';
+
+    if (type === 'chokepoint') {
+      const isCrit = data.risk_level === 'critical';
+      badgeClass = isCrit ? 'inspector-badge--critical' : 'inspector-badge--high';
+      badgeText = `Chokepoint · ${data.risk_level?.toUpperCase() || 'HIGH'}`;
+      subtitle = `Control: ${data.controlled_by || 'Strategic Maritime Passage'}`;
+      tiles = [
+        { label: 'Daily Flow', value: `${data.daily_flow_mbd}M bbl/d` },
+        { label: 'Strait Width', value: data.width_nm ? `${data.width_nm} nm` : 'Open Seas' },
+        { label: 'Threat Status', value: isCrit ? 'Active Standoff' : 'Elevated Watch' },
+        { label: 'India Vulnerability', value: data.id === 'hormuz' ? '55% Crude Share' : 'Transit Bottleneck' }
+      ];
+      narrative = data.id === 'hormuz'
+        ? `<strong>Strategic Assessment:</strong> 55% of India's crude imports transit this 21-nautical-mile strait. Complete closure or persistent tanker interdiction would abruptly strand ~2.4M bpd of feedstock destined for western refineries, making Jamnagar and Vadinar heavily reliant on emergency inventories.`
+        : (data.description ? `<strong>Threat Assessment:</strong> ${data.description} ${data.current_threat || ''}` : `<strong>Threat Assessment:</strong> Active surveillance corridor monitored for commercial shipping safety.`);
+
+      const scenarioId = data.id === 'hormuz' ? 'scenario-hormuz-partial' : 'scenario-redsea-reroute';
+      actionsHtml = `
+        <button class="btn btn--sm btn--primary" onclick="window.app.simulateArtifact('chokepoint', '${scenarioId}')"><i data-lucide="play"></i> Test Scenario</button>
+        <button class="btn btn--sm btn--secondary" onclick="window.app.focusArtifactOnMap('chokepoint', '${data.id}')"><i data-lucide="navigation"></i> Center Map</button>
+      `;
+    } else if (type === 'route') {
+      const score = data.current_risk_score || 50;
+      badgeClass = score >= 70 ? 'inspector-badge--high' : score >= 45 ? 'inspector-badge--moderate' : 'inspector-badge--low';
+      badgeText = `Maritime Route · Risk ${score}/100`;
+      subtitle = `${data.origin} → ${data.destination}`;
+      tiles = [
+        { label: 'Annual Volume', value: `${data.annual_volume_mmt} MMT/yr` },
+        { label: 'India Import Share', value: `${data.share_of_imports}%` },
+        { label: 'Corridor Distance', value: `${data.distance_nm.toLocaleString()} nm` },
+        { label: 'Transit Duration', value: `${data.transit_days} Days (${data.vessel_class || 'VLCC'})` }
+      ];
+      narrative = `<strong>Corridor Diagnostics:</strong> Traverses ${data.chokepoints.join(', ')}. Composite risk assessment evaluates chokepoint exposure, war risk insurance premiums, and tanker routing friction. Alternate routing via the Cape adds approx. +${Math.round(data.transit_days * 0.85)} days and ~$2.8M freight surcharge.`;
+      actionsHtml = `
+        <button class="btn btn--sm btn--primary" onclick="window.app.simulateArtifact('route', 'scenario-hormuz-partial')"><i data-lucide="activity"></i> Run Disruption</button>
+        <button class="btn btn--sm btn--secondary" onclick="window.app.focusArtifactOnMap('route', '${data.id}')"><i data-lucide="navigation"></i> Center Map</button>
+      `;
+    } else if (type === 'refinery') {
+      badgeClass = data.utilization < 0.88 ? 'inspector-badge--high' : 'inspector-badge--low';
+      badgeText = `Refinery · ${Math.round(data.utilization * 100)}% Utilized`;
+      subtitle = `${data.company} · ${data.location}`;
+      tiles = [
+        { label: 'Refining Capacity', value: `${data.capacity_mmtpa} MMTPA` },
+        { label: 'Daily Throughput', value: `${(data.capacity_bpd / 1000).toFixed(0)}K bpd` },
+        { label: 'Crude Stock Buffer', value: `${data.storage_days} Days Onsite` },
+        { label: 'Hormuz Exposure', value: `${Math.round(data.hormuz_exposure * 100)}% Crude Intake` }
+      ];
+      narrative = `<strong>Operational Resilience:</strong> Features Nelson Complexity Index of ${data.complexity_index || 12.0}, engineered for ${(data.crude_grades || []).slice(0, 3).join(', ')}. On-site inventory guarantees uninterrupted processing for ${data.storage_days} days before throttling is required.`;
+      actionsHtml = `
+        <button class="btn btn--sm btn--primary" onclick="window.app.switchView('procurement')"><i data-lucide="shopping-cart"></i> Supply Matrix</button>
+        <button class="btn btn--sm btn--secondary" onclick="window.app.focusArtifactOnMap('refinery', '${data.id}')"><i data-lucide="navigation"></i> Center Map</button>
+      `;
+    } else if (type === 'spr') {
+      badgeClass = 'inspector-badge--low';
+      badgeText = `Strategic Reserve · ${data.current_fill_pct}% Full`;
+      subtitle = `${data.location} · ${data.phase}`;
+      tiles = [
+        { label: 'Site Capacity', value: `${data.capacity_mmt} MMT` },
+        { label: 'Stored Volume', value: `${data.current_fill_mmt} MMT (${data.capacity_million_barrels}M bbl)` },
+        { label: 'Max Drawdown', value: `${(data.max_drawdown_rate_bpd / 1000).toFixed(0)}K bpd` },
+        { label: 'Coverage Longevity', value: `~${Math.round((data.current_fill_mmt * 7.33 * 1000000) / data.max_drawdown_rate_bpd)} Days at Max` }
+      ];
+      narrative = `<strong>National Strategic Reserve:</strong> ${data.storage_type} managed by ISPRL storing ${data.crude_stored}. Linked to regional refineries (${(data.connected_refineries || []).length} connected) to deliver emergency drawdown feedstock during maritime supply embargoes.`;
+      actionsHtml = `
+        <button class="btn btn--sm btn--primary" onclick="window.app.switchView('reserves')"><i data-lucide="shield"></i> Reserve Strategy</button>
+        <button class="btn btn--sm btn--secondary" onclick="window.app.focusArtifactOnMap('spr', '${data.id}')"><i data-lucide="navigation"></i> Center Map</button>
+      `;
+    } else if (type === 'vessel') {
+      badgeClass = 'inspector-badge--moderate';
+      badgeText = `Tanker · ${data.type || 'VLCC'}`;
+      subtitle = `${data.flag} Flag · DWT ${(data.dwt / 1000).toFixed(0)}K`;
+      tiles = [
+        { label: 'Cargo Payload', value: data.cargo || 'Crude Oil' },
+        { label: 'Speed / Heading', value: `${data.speed} kn / ${data.heading}°` },
+        { label: 'Destination', value: data.destination || 'West Coast Ports' },
+        { label: 'AIS Tracking', value: 'Live Simulation' }
+      ];
+      narrative = `<strong>Vessel Telemetry:</strong> Commercial crude oil tanker actively traversing international sea lanes bound for Indian port terminals. Speed and heading indicate standard maritime passage.`;
+      actionsHtml = `
+        <button class="btn btn--sm btn--secondary" onclick="window.app.focusArtifactOnMap('vessel', '${data.name}')" style="width:100%"><i data-lucide="navigation"></i> Center Map</button>
+      `;
+    }
+
+    detailsContainer.innerHTML = `
+      <div class="inspector-card">
+        <div class="inspector-badge-row">
+          <span class="inspector-badge ${badgeClass}">${badgeText}</span>
+          <button class="btn btn--xs btn--ghost" onclick="window.app.resetInspector()" title="Back to Presets">
+            <i data-lucide="x"></i> Close
+          </button>
+        </div>
+        <div>
+          <h3 class="inspector-title">${title}</h3>
+          <div class="inspector-subtitle">${subtitle}</div>
+        </div>
+        <div class="inspector-grid">
+          ${tiles.map(t => `
+            <div class="inspector-tile">
+              <span class="inspector-tile__label">${t.label}</span>
+              <span class="inspector-tile__value">${t.value}</span>
+            </div>
+          `).join('')}
+        </div>
+        <div class="inspector-narrative">
+          ${narrative}
+        </div>
+        <div class="inspector-actions">
+          ${actionsHtml}
+        </div>
+      </div>
+    `;
+
+    if (window.lucide) {
+      window.lucide.createIcons({ root: detailsContainer });
+    }
+  }
+
+  resetInspector() {
+    const emptyState = document.getElementById('inspector-empty');
+    const detailsContainer = document.getElementById('inspector-details');
+    if (emptyState) emptyState.style.display = 'block';
+    if (detailsContainer) {
+      detailsContainer.style.display = 'none';
+      detailsContainer.innerHTML = '';
+    }
+  }
+
+  selectQuickArtifact(type, id) {
+    let item = null;
+    if (type === 'chokepoint') item = CHOKEPOINTS.find(c => c.id === id);
+    else if (type === 'route') item = SUPPLY_ROUTES.find(r => r.id === id);
+    else if (type === 'refinery') item = REFINERIES.find(r => r.id === id);
+    else if (type === 'spr') item = SPR_SITES.find(s => s.id === id);
+
+    if (item) {
+      this.inspectArtifact(type, item);
+      this.focusArtifactOnMap(type, id);
+    }
+  }
+
+  simulateArtifact(type, scenarioId) {
+    this.switchView('scenarios');
+    const targetScenario = scenarioId || 'scenario-hormuz-partial';
+    this.selectScenario(targetScenario);
+  }
+
+  focusArtifactOnMap(type, id) {
+    if (!this.mapEngine) return;
+    let coords = null;
+    let zoom = 6;
+
+    if (type === 'chokepoint') {
+      const cp = CHOKEPOINTS.find(c => c.id === id);
+      if (cp) { coords = [cp.coordinates[1], cp.coordinates[0]]; zoom = 7; }
+    } else if (type === 'refinery') {
+      const ref = REFINERIES.find(r => r.id === id);
+      if (ref) { coords = [ref.coordinates[1], ref.coordinates[0]]; zoom = 8; }
+    } else if (type === 'spr') {
+      const spr = SPR_SITES.find(s => s.id === id);
+      if (spr) { coords = [spr.coordinates[1], spr.coordinates[0]]; zoom = 8; }
+    } else if (type === 'route') {
+      const route = SUPPLY_ROUTES.find(r => r.id === id);
+      if (route && route.coordinates?.length) {
+        const mid = route.coordinates[Math.floor(route.coordinates.length / 2)];
+        coords = [mid[1], mid[0]];
+        zoom = 5;
+      }
+    } else if (type === 'vessel') {
+      const vessel = SIMULATED_VESSELS.find(v => v.name === id);
+      if (vessel) { coords = [vessel.position[1], vessel.position[0]]; zoom = 6; }
+    }
+
+    if (coords) {
+      this.mapEngine.focusOn(coords[0], coords[1], zoom);
+    }
   }
 
   switchView(viewId) {
